@@ -740,5 +740,182 @@ kubectl create -f pod.yaml -n kirannamespace
 
 kubectl get pods --all-namespaces
 
+================
+
+DATE: 18 APR 2025
+
+resource requests & limits :
+
+Resource Requests
+A request is the amount of CPU and memory that Kubernetes will allocate to a container. When you specify a request, Kubernetes ensures that your container will always have at least that much resource available when it runs
+
+------------
+LIMITS : 
+The maximum amount of CPU and memory the container can use. 
+If the container exceeds these, it may be throttled (CPU) or killed (Memory).
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example-pod
+spec:
+  containers:
+  - name: example-container
+    image: nginx
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "128Mi"
+      limits:
+        cpu: "1"
+        memory: "256Mi"
+
+
+==========================================================================
+how to log into the pod ? 
+
+kubect exec -it <podname> -- /bin/bash
+kubect exec -it <podname> -- env
+
+----------------------
+
+ENV vs CONFIG MAP vs  SECRET 
+
+Environment Variables (ENV):
+
+Key-value pairs injected directly into pod/containers.
+App configs like port numbers, feature flags, etc.
+Env variables are Typically non-sensitive.
+Not encrypted.
+Easily visible in kubectl describe pod.
+
+=====================
+
+ENV:
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: environment
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    env:
+      - name: course
+        value: aws devops
+      - name: trainer
+        value: "Madhu kiran Gorekar"
+      - name: Institute 
+        value: MindCircuit 
+
+=====================
+Secrets and ConfigMaps are objects used to manage configuration data, sensitive information, and non-sensitive application settings in a secure and organized manner. They allow you to decouple configuration from application code, making it easier to manage and update configurations in a Kubernetes cluster.
+
+A ConfigMap is used to store non-sensitive, configuration-related data in the form of key-value pairs. 
+
+ex: environment variables, configuration files, or command-line arguments
+
+
+configmap.yaml:
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+data:
+  course: aws devops
+  trainer: Madhukirna gorekar
+  Institute: Mindcircuit
+  
+========================  
+kind: Pod
+apiVersion: v1
+metadata:
+  name: pod-config
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    envFrom:
+    - configMapRef:
+        name: nginx-config
+
+===========================================
+A Secret is used to store sensitive data, such as passwords, OAuth tokens, SSH keys, and API keys, in a way that is more secure than using a plain ConfigMap. Secrets are encoded (base64), which helps to obscure their content but is not a fully secure solution; they are more secure than environment variables or plain text files
+
+
+encode:
+
+
+echo -n "Aws DevOps" | base64  ---------> QXdzIERldk9wcw==
+echo -n "Madhukiran Gorekar" | base64  ----> TWFkaHVraXJhbiBHb3Jla2Fy
+echo -n "MindCircuit" | base64      -----> TWluZENpcmN1aXQ=
+
+
+
+
+decode:
+echo -n "QXdzIERldk9wcw==" | base64 --decode
+echo -n "TWFkaHVraXJuYSBnb3Jla2Fy" | base64 -d
+==================================
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pod-secret
+type: Opaque
+data:
+  course: YXdzIGRldm9wcw==
+  trainer: TWFkaHVraXJuYSBnb3Jla2Fy
+
+
+============================
+kind: Pod
+apiVersion: v1
+metadata:
+  name: pod-secret
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    envFrom:
+    - secretRef:
+        name: pod-secret
+
+=================================================================
+
+
+kubectl get secret 
+
+------------------------------------------------
+CLUSTER UPGRADE in K8S 
+
+======================================
+
+=============================
+LABELS vs ANNOTATIONS in K8S 
+
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fbpod
+  labels:
+    app: facebook
+	env: lab
+	
+  annotations:
+    imageregistry: "https://hub.docker.com/"
+    build-url: "https://jenkins.example.com/build/142"
+	prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+	
+spec:
+  containers:
+  - name: nginx
+    image: nginx
 
 
