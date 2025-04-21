@@ -1,0 +1,833 @@
+18th march 2025
+=================
+
+create an instance and connect to it.
+cd /opt
+vim jenkins_setup.sh
+
+scripting (automating Jenkins script)
+===========
+
+#!/bin/bash
+sudo yum update –y
+sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+sudo yum upgrade
+sudo dnf install java-17-amazon-corretto -y
+sudo yum install jenkins -y
+
+sudo systemctl enable jenkins
+sudo systemctl start jenkins
+sudo mount -o remount,size=4G /tmp/
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+========
+
+cat jenkins_setup.sh
+chmod 700 jenkins_setup.sh (giving executing permissions to owner)
+./jenkins_setup.sh
+
+(Note: another way to create file name:
+echo "my name is hyma" >hyma
+cat hyma
+)
+
+automating tomcat installation
+===========================
+
+vim chmod tomcat_setup.sh
+
+cd /opt
+sudo wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.102/bin/apache-tomcat-9.0.102.tar.gz
+sudo tar -xvf /opt/apache-tomcat-9.0.102.tar.gz
+cd /opt/apache-tomcat-9.0.102/webapps/manager/META-INF
+sudo sed -i 's/"127\\.\\d+\\.\\d+\\.\\d+|::1|0:0:0:0:0:0:0:1"/".*"/g' context.xml
+cd /opt/apache-tomcat-9.0.102/conf
+sudo mv tomcat-users.xml tomcat-users_bkup_18mar2025.xml
+sudo echo '<?xml version="1.0" encoding="utf-8"?>
+        <tomcat-users>
+        <role rolename="manager-gui"/>
+        <user username="tomcat" password="tomcat" roles="manager-gui, manager-script, manager-status"/>
+        </tomcat-users>' > tomcat-users.xml
+cd /opt/apache-tomcat-9.0.102/conf/
+sudo sed -i 's/Connector port="8080"/Connector port="8090"/g' server.xml
+sudo /opt/apache-tomcat-9.0.102/bin/startup.sh
+
+======================
+Build tools:
+java --> maven, gradle, ant (we are learning maven)
+
+MAVEN - Build tool
+========
+It is not only a build tool, it is also a project-management tool.
+open-source, introduced by apache.
+tomcat also introduced by apache
+open source means it is available in market.
+maven is a java based build tool.
+Java-> programming language--> developed by sun microsystems --> now procured by oracle
+
+Open JDK--> we may get issues
+Oracle java-->enterprise level, subscription based
+
+1) it checks pom.xml file (contains dependencies, configurations etc/.,)
+
+install java and maven on windows
+================================
+1) install oracle java on windows
+ 1) google --> java download for windows
+ java 8 --> windows --> x64 installer --> click on click, create an oracle account
+mail: medagamreddy306@gmail.com
+password: Hyma@123
+
+installed java
+ check if it is installed or not
+==> this PC --> c: drive --> program files --> java
+
+How our operating system knows which java is installed in program files --> we need to setup environment variables.
+1) configure JAVA_HOME: C:\Program Files\Java\jdk-1.8
+2) PATH (to execute commands in /bin) : C:\Program Files\Java\jdk-1.8\bin
+3) search "env"--> edit the system environment variables
+give JAVA_HOME --> user variables
+give path --> system variables
+
+in cmd, java -version
+=================================================
+
+Maven download for windows:
+---------------------------
+download apache maven-the apache software foundation
+windows --> zip archive
+extract
+copied and pasted in program files.
+
+M2_HOME: C:\Program Files\apache-maven-3.9.9-bin\apache-maven-3.9.9
+path: C:\Program Files\apache-maven-3.9.9-bin\apache-maven-3.9.9\bin
+=================================================
+task: mvn --version
+java -version
+screenshots in windows
+
+difference between installations in windows and Linux
+=====
+In windows, we can choose version
+In Linux, we get the version only mentioned in the Linux.
+
+
+19th march 2025
+=============
+why devops: 
+
+code deploy to tomcat using windows and Linux:
+======================================
+1)create separate instances for Jenkins and tomcat and connect
+2) install java and Jenkins through script on Jenkins server
+install git and maven
+open jenkins
+3) install tomcat on tomcat server.
+install java on tomcat server
+4) game of life --> practice on windows folder and deploy 
+build, artifact and deployed to tomcat success
+(git clone --> ll --> cd game of life --> mvn clean install --> cd game of life web/ --> ll --> cd target --> ll)
+
+5) now practicing on Linux
+
+ clone git repo
+ mvn clean install --> build failure due to different versions and dependencies
+
+(git clone --> ll --> cd game of life --> mvn clean install -> build failure
+
+if build is success
+--> cd game of life web/ --> ll --> cd target --> ll)
+
+go to java downloads oracle and install java 8 Linux and get it through windows using below command format
+
+scp -i jenkinskey.pem jdk-8u441-linux-x64.tar.gz ec2-user@ec2-3-84-40-59.compute-1.amazonaws.com:/tmp
+
+cd /tmp --> check in Linux Jenkins server
+ll
+jdk-8u441-linux-x64.tar.gz displayed 
+
+mv jdk-8u441-linux-x64.tar.gz /opt
+cd /opt
+ll
+
+tar -xvf 
+ll
+
+(java 8 done in Linux, how to tell our OS that java is installed here and use it)
+
+-> cd /opt
+ll
+cd jdk1.8.0_441
+pwd
+
+JAVA_HOME : /opt/jdk1.8.0_441/
+Path: /opt/jdk1.8.0_441/bin
+To put variable and it's path in Linux, we need to write a file
+
+set java environment variables in Linux
+=======================
+cd /etc/profile.d
+
+vim java.sh
+export JAVA_HOME=/opt/jdk1.8.0_441/
+export PATH=${JAVA_HOME}/bin:${PATH}
+
+source java.sh
+ (java 1.8 done)
+
+java -version
+
+(git clone --> ll --> cd game of life --> mvn clean install --> cd game of life web/ --> ll --> cd target --> ll)
+
+echo hyma -> it prints hyma
+echo $hyma --> prints the value of hyma
+
+how to tell Jenkins to use java 8
+---------------------------
+dashboard --> manage Jenkins --> tools --> JDK Installations
+ go to job and build
+
+
+if MVN want plugins
+--------
+Local
+Central
+Remote repo
+
+20th march
+=========
+source code --> mvn clean install --> maven build life cycle-->phases--> plugins --> goals
+*** Interview --> maven build lifecycle
+
+MAVEN LIFECYCLE
+=================
+validate --> checks the resources and project is correct
+compile --> compile source code to byte code
+test --> test using testing frameworks
+package --> create an artifact using .jar .war
+integration test --> run integration tests
+verify--> perform any checks that package meets quality criteria
+install--> install package into local maven repository, making it available for other projects on your local machine.
+deploy --> copy the final package to remote repo
+
+mvn clean install: it removes the previous builds and install the phase (to compile,test and package your application), finally this
+command copies the generated artifact to local maven repository (.m2)
+
+
+pm.xml--> project object model.xml
+
+artifacts keep on nexus, jfrog artifactories --> deploy phase
+
+some pom.xml file contains -SNAPSHOT (this means it is in testing phase not ready for prod (final)phase)
+
+(selenium maven dependency)
+
+pom.xml is heart for maven
+maven is not only a build tool but also a project management tool.
+Ant, Gradle are build tools only
+Instead of developers, maven generates the directory structures.
+
+mvn --> build + PM
+
+directory structure for the facebook project.
+
+mvn archetype:generate
+
+eg: group id :batch15-fb
+    artifactid: facebook
+    package: batch15-fb
+
+maven generates a project structure with the details you give.
+
+Different stages should be built on different slave nodes:
+==========================================================
+*** imp question
+
+------------
+eg: git clone -> slave1
+build code using maven --> slave2
+
+pipeline {
+    agent none
+
+    stages {
+        stage('clone GIT Repo') {
+	    agent {label 'slave-1'} //Agent for Git operations
+            steps {
+                echo 'Cloning code from GitHub Repo'
+		        git branch: 'main', url: 'https://github.com/hymamedagam/hyma_mindcircuit15d.git'
+			
+			stash includes: '', name: 'sourceCode'
+	        }
+	    }
+	}
+	    stage('Build Artifact') {
+	        agent {label 'slave-2'} //Agent for Maven build
+	        steps {
+		    script {
+			unstash 'sourceCode'
+
+	            echo 'Build Artifact using maven build tool'
+		        sh 'mvn clean install'
+		    }
+	        }
+	    }
+	    post {
+		success {
+			echo 'Pipeline completed successfully!'
+		}
+		failure {
+			echo 'Pipeline failed. Please check the logs.'
+		}
+	}
+}
+
+21st march
+==================
+
+Note: when Jenkins is running slow after stopping and starting a VM ip address is changed. we need to change the ip address in
+ manage jenkins-->system --> Jenkins ip(change Jenkins url) and restart Jenkins
+
+1)views in Jenkins:
+dashboard --> my views
+
+2) git fork and practise (build, deploy to tomcat) 
+
+(GitHub profiles examples)
+
+create GitHub repo's for each topic
+
+Maintain proper GitHub and linkdin account
+
+
+Triggers:
+GitHub hook trigger for GITScm polling : GitHub should send a request to Jenkins that a change happened in source code.
+GitHub Webhook: Integrate Jenkins with GitHub
+
+Real time lo use chesedhi --> webhook
+
+Jenkins build periodically vs Poll SCM vs webhooks (chatgpt)
+
+==>setup webhooks in GitHub (settings)
+webhook: allow external services to be notified when certain events happen. When the specified events happen, we will send a POST request to each of the URLs you provide.
+
+under GitHub
+settings --> webhooks --> Add webhook
+pay-load url: Jenkins url/github-webhook/
+content type: application/Json
+add webhook  --> API call went
+change source code in GitHub
+select GitHub hook trigger for GITScm polling option in triggers. then it builds automatically.
+
+deploy code using webhooks in pipelinescript
+
+=============================
+How to integrate webhook in ci/cd pipeline:
+
+pipeline {
+    agent any
+    
+    triggers {
+        githubPush()
+    }
+
+    stages {
+        stage('clean workspace') {
+            steps {
+	        cleanWs()
+	    }
+	}
+        stage('clone GIT Repo') {
+            steps {
+                echo 'Cloning code from GitHub Repo'
+		        git branch: 'main', url: 'https://github.com/hymamedagam/hyma_mindcircuit15d.git'
+	        }
+	    }
+	    stage('Build Artifact') {
+	        steps {
+	            echo 'Build Artifact using maven build tool'
+		        sh 'mvn clean install'
+	        }
+	    }
+	    stage('Deploy to Tomcat') {
+	        steps {
+	            echo 'Deploying artifact on to Tomcat'
+		        deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://ec2-3-87-100-51.compute-1.amazonaws.com:8081/')], contextPath: 'b15-insta', war: '**/*.war'
+	        }
+	    }
+    }
+}
+
+
+======
+Adding basic variables to the script:
+
+ADDING ENVIRONEMNT VARIABLES :
+Added an environment block to define reusable environment variables:
+         GIT_URL – Git repository URL
+         BRANCH – Git branch to clone
+         TOMCAT_URL – Tomcat server URL
+         TOMCAT_CREDENTIALS_ID – Credentials ID for Tomcat deployment
+         CONTEXT_PATH – Context path for the app deployment
+		 
+This makes the pipeline cleaner, more flexible, and easier to maintain!
+------------------------------
+
+pipeline {
+    agent any
+	
+    environment {
+        GIT_URL = 'https://github.com/hymamedagam/hyma_mindcircuit15d.git'
+        BRANCH = 'main'
+        TOMCAT_URL = 'http://ec2-54-173-142-48.compute-1.amazonaws.com:8080/'
+        TOMCAT_CREDENTIALS_ID = 'tomcat'
+        CONTEXT_PATH = 'webhook-app'
+	WAR_FILE_PATH= '**/*.war'
+    }
+
+    stages {
+
+        stage('CLONE GITHUB CODE') {
+            steps {
+                echo 'In this stage, code will be cloned'
+                git branch: "${BRANCH}", url: "${GIT_URL}"
+            }
+        }
+
+        stage('BUILDING THE CODE') {
+            steps {
+                echo 'In this stage, code will be built and an mvn artifact will be generated'
+                sh 'mvn clean install'
+            }
+        }
+
+        stage('DEPLOY') {
+            steps {
+                echo 'In this stage, .war artifact will be deployed onto Tomcat'
+                deploy adapters: [tomcat9(credentialsId: "${TOMCAT_CREDENTIALS_ID}", path: '', url: "${TOMCAT_URL}")], 
+                contextPath: "${CONTEXT_PATH}", war: "${WAR_FILE_PATH}"            
+            }
+	}
+    }
+}
+
+==========================================
+Q. how do you move to next stage even first stage failed.
+
+A. use try and catch blocks
+
+
+pipeline {
+    agent any
+    environment {
+        GIT_URL = 'https://github.com/hymamedagam/hyma_mindcircuit15d.git'
+        BRANCH = 'main'
+        TOMCAT_URL = 'http://ec2-54-234-209-231.compute-1.amazonaws.com:8080/'
+        TOMCAT_CREDENTIALS_ID = 'tomcat'
+        CONTEXT_PATH = 'b15-insta'
+	    WAR_FILE_PATH= '**/*.war'
+    }
+
+    
+    triggers {
+        githubPush()
+    }
+    stages {
+        stage('cleanworkspace') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('clone repo') {
+            steps {
+                script {
+                    try {
+                        echo 'In this stage, code will be cloned'
+                        git branch: "${BRANCH}", url: "${GIT_URL}"
+                    }
+                    catch (Exception e) {
+                        echo "stage1 failed: ${e.message}"
+                    }
+                }
+
+            }
+
+        }
+            
+        stage('Build artifact') {
+            steps {
+                script {
+                    try {
+                        echo 'In this stage, articact is built'
+                        sh 'mvn clean install'
+
+                    }
+                    catch (Exception e) {
+                        echo "stage1 failed: ${e.message}"
+                    }
+                }
+            }
+        }
+        stage('Deploy to tomcat') {
+            steps {
+                script {
+                    try {
+                        echo 'In this stage, artifact to tomcat'
+                        deploy adapters: [tomcat9(credentialsId: "${TOMCAT_CREDENTIALS_ID}", path: '', url: "${TOMCAT_URL}")], 
+                contextPath: "${CONTEXT_PATH}", war: "${WAR_FILE_PATH}"
+
+                    }
+                    catch (Exception e) {
+                        echo "stage1 failed: ${e.message}"
+                    }
+                }
+                 
+            }
+        }
+    }
+}
+
+=========================================
+Parallel stage execution:
+========================================
+I want to deploy in multiple environments (lab, sandbox, prod )        
+
+use parallel block
+
+pipeline {
+    agent any
+    environment {
+        GIT_URL = 'https://github.com/hymamedagam/hyma_mindcircuit15d.git'
+        BRANCH = 'main'
+        TOMCAT_URL = 'http://ec2-54-234-209-231.compute-1.amazonaws.com:8080/'
+        TOMCAT_CREDENTIALS_ID = 'tomcat'
+        CONTEXT_PATH = 'b15-insta'
+	    WAR_FILE_PATH= '**/*.war'
+    }
+
+    
+    triggers {
+        githubPush()
+    }
+    stages {
+        stage('cleanworkspace') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('clone repo') {
+            steps {
+                script {
+                    try {
+                        echo 'In this stage, code will be cloned'
+                        git branch: "${BRANCH}", url: "${GIT_URL}"
+                    }
+                    catch (Exception e) {
+                        echo "stage1 failed: ${e.message}"
+                    }
+                }
+
+            }
+
+        }
+            
+        stage('Build artifact') {
+            steps {
+                script {
+                    try {
+                        echo 'In this stage, articact is built'
+                        sh 'mvn clean install'
+
+                    }
+                    catch (Exception e) {
+                        echo "stage1 failed: ${e.message}"
+                    }
+                }
+            }
+        }
+        stage('Deploy to multiple environments') {
+	    parallel {
+		stage('lab') {
+		    steps {
+			echo "deploy on lab"
+                    }
+		}
+            	stage('sbox') {
+		    steps {
+			echo "deploy on sbox"
+		    }
+		}
+		stage('UAT') {
+		    steps {
+			echo "deploy on UAT"
+		    }
+		}
+	}
+}
+
+22-march-2025
+===============
+Nexus integration with Jenkins
+=================================
+Artifact: .war/jar/ear file 
+
+GitHub: to store code (source code management)
+artifactory: similar to repository, it stores artifacts for backup.(artifact management)
+
+famous artifactory: Nexus.
+Nexus: artifact management
+
+artifactories: Nexus, Jfrog
+
+NEXUS Vs Jfrog
+
+NEXUS: Introduced by SONATYPE NEXUS
+
+==============
+1) create two instances one for Jenkins and another one for nexus (t2.medium)
+
+Note: SSH default port : 22 (to login to the server using SSH)
+      Jenkins default port : 8080 
+      Tomcat default port : 8080
+      Nexus default port : 8081 (access in browser)
+
+=================
+
+Linux commands:
+
+cd /opt
+chown : change ownership on a file
+
+eg: touch test
+ chown ec2-uesr:ec2-user test
+
+systemctl status Jenkins (it will work) --> we can see service: enabled  (by default Jenkins developer enabled systemd service file)
+
+systemctl status tomcat (it won't work) --> we manually write a service file (in systemd) and enable in booting so it will work.
+
+==================
+
+Install nexus:
+
+nexus implementation reference article : 
+
+https://devopscube.com/how-to-install-latest-sonatype-nexus-3-on-linux/
+
+SONATYPE NEXUS SYSTEM REQUIREMENTS:
+
+1) Minimum 1 VCPU & 2GB Memory
+2)server firewall opened for port 22 & 8081
+3)OpenJDK 17
+--> Nexus also a java related software like Jenkins and tomcat
+4) All nexus processes should run as a non-root nexus user.
+
+
+Sonatype Nexus 3 on Linux ec2
+==========================
+1) Login to your Linux server(nexus server) and update yum packages. also install require utilities
+
+sudo yum update -y
+sudo yum install wget -y
+
+(it will show nothing to do, because it(wget) already exists on Linux machine.
+eg: centOS does not contains wget)
+
+Changes/updates in above article :
+
+2) install OpenJDK
+sudo yum install java-17 -y  (  NOT --> sudo yum install java-17-openjdk -y   ) 
+java --version
+cd /opt
+ll
+
+3)create a directory named app and cd into the directory.
+ sudo mkdir /app && cd /app
+ ll
+
+4) download the latest nexus
+Note: google --> sonatype nexus installation on ec2 instance --> sonatype(install Nexus repository)
+sonatype nexus repository
+
+ wget https://download.sonatype.com/nexus/3/nexus-unix-x86-64-3.78.2-04.tar.gz        
+ 
+ (  NOT --> sudo wget -O nexus.tar.gz https://download.sonatype.com/nexus/3/latest-unix.tar.gz --> this is from above mentioned article) 
+
+ll
+
+=> tar -xvf nexus-unix-x86-64-3.78.2-04.tar.gz
+(if we extarct this we will get two folders)
+(nexus-3.78.2-04
+nexus-unix-x86-64-3.78.2-04.tar.gz
+sonatype-work)
+
+rename the untared file to nexus
+mv nexus-3.78.2-04 nexus
+ll
+
+5) As a good security purpose, it is not advised to run nexus service with root privileges. So create a new user named
+nexus to run the nexus service.
+
+sudo adduser nexus
+
+change the ownership of nexus files and nexus data directory to nexus user.
+
+chown -R nexus:nexus /app/nexus  (-R --> Recursively)
+ll
+
+ll nexus
+
+chown -R nexus:nexus /app/sonatype-work
+
+cd nexus/
+ll
+cd bin/
+ll
+
+6) open /app/nexus/bin/nexus.rc file
+
+vi /app/nexus/bin/nexus.rc
+esc -->i
+run_as_user="nexus"
+
+7) (optional)
+
+ll
+pwd
+(in bin/, we can see nexus executable file, here we can start and stop using ./start, ./stop like that. but we want different thing like Jenkins)
+
+Running Nexus as a System Service
+=================================
+
+It is better to have systemd entry to manage nexus using systemctl.
+follow the steps given below for adding nexus as a systemd service.
+
+1) create a nexus systemd unit file
+
+
+esc -->i
+[Unit]
+Description=nexus service
+After=network.target
+
+[Service]
+Type=forking
+LimitNOFILE=65536
+User=nexus
+Group=nexus
+ExecStart=/app/nexus/bin/nexus start
+ExecStop=/app/nexus/bin/nexus stop
+User=nexus
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
+
+esc:wq
+
+Manage Nexus Service:
+=========================
+
+2) sudo chkconfig nexus on  (chkconfig is similar to systemctl used for enabling in booting)
+
+3) sudo systemctl start nexus
+4) sudo systemctl status nexus
+
+Access in web using, nexus public ip : port number (8081)
+where you can store artifacts
+
+signin
+username: admin
+cat /app/sonatype-work/nexus3/admin.password
+(password came. copy and paste)
+password:
+
+signin
+
+(we can create new password)
+
+Enable anonymous access
+
+================================
+
+Note: UI
+
+need to create repositories in UI.
+latest one's we keep in tomcat.
+
+version id --> 8.2.0            -->>>   going to be released
+version id --> 8.2.0-SNAPSHOT   -->>>   under development / under implementation
+
+1) create two repositories one for SNAPSHOT artifacts and another one for release artifacts.
+
+settings --> Repositories --> create repository --> maven2 (hosted)
+
+===================================================
+ Eg: CREATE 2 REPOSITORIES FOR ARTIFACTS 
+  
+  ONE FOR RELEASE ARTIFACTS --- batch15-repo-release ( select 'release' under version policy if it is for release repo)
+  
+  ONE FOR SNAPSHOT ARTIFACTS -- batch15-repo-snapshot (select 'snapshot' under version policy if it is for release repo)
+
+
+================================
+
+snapshot artifacts go to snapshot repo and release artifacts go to release repo.
+
+we need to mention in pom.xml file that which artifact goes to which repo based on it.
+
+
+================================
+in POM.XML :
+
+	<distributionManagement>
+		 <snapshotRepository>
+		    <id>NexusRepo</id>
+		    <url>http://54.205.185.238:8081/repository/batch15-repo-snapshot/</url>
+		 </snapshotRepository>
+		
+		<repository>
+		    <id>NexusRepo</id>
+		    <url>http://54.205.185.238:8081/repository/batch15-repo-release/</url>
+		</repository>
+  	</distributionManagement>
+	
+	
+
+==================== 
+Note: IN  JENKINS/MAVEN SERVER
+cd /opt
+cd /etc/maven/
+ll
+(we can see settings.xml --> it contains maven configuration)
+vim settings.xml
+esc -->i
+(authenticating credentials while deploying)
+(<!
+---
+---
+--> these are comments, it can be ignored)
+servers section
+====================  
+==>  IN  JENKINS/MAVEN SERVER --> /etc/maven/setting.xml 
+  
+  ADD the content 
+  
+ <server>
+      <id>NexusRepo</id>
+      <username>admin</username>
+      <password>h9y3m9a2</password>
+ </server>
+  
+  ===============================================================
+ esc:wq
+
+Go to Jenkins
+create a job with freestyle project
+(mvn clean install --> for maven home directory (.m2)
+mvn clean deploy --> installed and deployed in nexus)
+
+
+browse contents
+
+23-march-2025 and 24-march-2025 --> holiday
