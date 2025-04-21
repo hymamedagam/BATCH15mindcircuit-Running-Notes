@@ -1,0 +1,644 @@
+Jenkins:
+===========
+==> Jenkins is a free and open-source automation server that facilitates the building, testing, and deployment of software by automating various stages of software development lifecycle.
+It is one of the most widely used tools for implementing continuous integration(CI) and Continuous delivery (CD) practices.
+It is written in Java and runs on java only.
+
+
+Why Jenkins: Jenkins is popular because it:
+
+1)Automates repetitive tasks like code builds, tests, and deployments.
+2)Integrates with various DevOps tools like Git, Docker, Kubernetes, Terraform, AWS, GCP, and Azure
+3) Has a vast plugin ecosystem, making it highly extensible
+4) Supports both GUI based configuration and Infrastructure as code (Jenkinsfile)
+5) Runs on multiple platforms (Windows, Linux, macOS)
+6) Has a strong community support.
+
+
+Key features:
+
+1) Supports 1800+ plugins for integration with various tools.
+2) works with Git, Docker, Kubernetes, Terraform, and more
+3) Automates deployment to cloud services (GCP, AWS, Azure)
+4) Can be extended with Groovy scripts and pipelines.
+5) can be used in small and large-scale CI/CD pipelines
+6) Supports parallel execution on multiple machines.
+
+
+What type of software is Jenkins:
+
+Category: CI/CD Automation tool
+Type: Server-based software
+Platform: Java-based, runs on any OS with Java support
+Deployment: Can be installed on a VM, run in a container, or deployed in Kubernetes.
+
+How Jenkins works:
+
+1) Developers push code to a repository (Git, GitHub, GitLab, etc.)
+2) Jenkins fetches the latest code and runs automated builds.
+3) Jenkins runs tests to check for issues
+4) If successful, Jenkins can deploy the application automatically.
+
+History of Jenkins:
+
+Jenkins was originally developed as Hudson by Kohusuke Kawaguchi in 2004 while he was working at sun microsystems.
+
+1) 2004 - Hudson was created to automate builds for java applications
+2) 2010 - renames to Jenkins
+3) 2011 - Jenkins gained rapid adoption in the devops community.
+4) 2014 - Jenkins 2.0 introduced pipeline as code with jenkinsfile
+5) 2019 - Jenkins X was introduced for cloud-native CI/CD tool
+6) 2020 - Present -Jenkins continues to be a leading CI/CD tool, integrating with modern devops technologies
+like Kubernetes, Terraform, and cloud services.
+
+
+Why Jenkins came into the picture
+=================================
+==> Jenkins came into the picture to address the inefficiencies and challenges of traditional software 
+development and deployment methods.
+The traditional approach involved manually compiling code, running tests, and deploying applications,
+which was slow, error-prone, and lacked automation.
+
+Disadvantages before Jenkins:
+===========================
+1) Manual process: Developers had to manually build, test, and deploy code, leading to inconsistencies and human errors.
+2) Delayed feedback: Bugs were discovered late in the development cycle, increasing debugging time and effort.
+3) Integration issues: Merging code from different developers often caused conflicts, making integration complex and time-consuming.
+4) Slow releases: Without automation, software release took weeks or even months.
+5) High failure rate: Deployments often failed due to untested or improperly integrated code.
+
+How Jenkins solves these issues:
+==================================
+1) Automated builds: Jenkins compiles and builds the code automatically.
+2) Continuous integration: It integrates code changes frequently, reducing conflicts.
+3) Automated testing: Runs tests automatically, ensuring early bug detection
+4) Faster deployment: Automates deployment to production or staging environments
+5) Scalability: Supports plugins and can be integrated with tools like Docker, Kubernetes, and Terraform.
+
+
+Jenkins Dockerfile:
+=====================
+
+vim Dockerfile.jenkins
+esc-->i
+
+FROM amazonlinux
+RUN yum update -y && yum install git -y && yum install maven -y
+WORKDIR /etc/yum/repos.d
+RUN touch Jenkins.repo
+ADD https://pkg.jenkins.io/redhat-stable/jenkins.repo /etc/yum.repos.d/jenkins.repo
+RUN rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+RUN yum upgrade && yum install java-17-amazon-corretto -y && yum install jenkins -y
+CMD ["/usr/bin/jenkins"]
+EXPOSE 8080
+
+docker build -t hymavathimedagam/docker1repo:jenkins_dkfile -f Dockerfile.jenkins .
+docker run -it --name jenkins1 -p 8086:8080 hymavathimedagam/docker1repo:jenkins_dkfile
+docker push hymavathimedagam/docker1repo:jenkins_dkfile
+==================================
+
+4th march 2025
+===============
+
+Jenkins: open source and plugin based tool which is used to create jobs.
+Jenkins is heart of devops
+using "manage Jenkins", we can do everything with Jenkins.
+
+yum --> package manager in Linux
+
+Java ---> dependency for jenkins
+
+How to install Jenkins.
+==========================================
+google --> Jenkins install in amazon Linux --> click on first link and it will show you an official documentation.
+
+sudo yum update –y
+sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+sudo yum upgrade
+sudo dnf install java-17-amazon-corretto -y
+sudo yum install jenkins -y
+sudo systemctl enable jenkins
+sudo systemctl start Jenkins
+
+
+sudo systemctl status Jenkins
+
+===========================
+
+port : 8080
+
+(in browser) public_ip:port
+
+
+===================================
+1) create an EC2 instance
+2) save the private key in a separate folder
+3) Enter into that folder and open a git bash here option (pwd,ll)
+4) select an instance and right click--> select connect (to connect to the instance)
+5) go to the SSH client, type remaining two commands (chmod 400, ssh -i)
+6) sudo su -
+7) hostnamectl set-hostname <name>
+8) sudo su -
+9) install Jenkins using few commands
+
+sudo yum update –y
+sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+sudo yum upgrade
+sudo dnf install java-17-amazon-corretto -y
+sudo yum install jenkins -y
+sudo systemctl enable jenkins
+sudo systemctl start jenkins
+
+
+sudo systemctl status jenkins
+=============================
+7) connect instance to Jenkins server using public ip with port 8080. eg: 44.23.16.18:8080
+8) to unlock Jenkins, use cat command and the path mentioned over there.
+
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+9) install required pluggins
+10) Jenkins started
+
+
+11)mount -o remount,size=4G /tmp/ (to remove error in Jenkins(error: Built-in-node (offline)))
+12)systemctl stop jenkins
+13)systemctl start jenkins
+
+
+==> Jenkins is a pluggin based tool to create jobs. Item or job or project
+
+Jenkins workspace path : /var/lib/Jenkins/
+cd /var/lib/Jenkins/
+pwd
+ll
+
+cd workspace/
+ll
+date
+
+1) new-item
+2) schedule build
+
+
+Manage Jenkins:
+================
+you have admin access and you want to give access to users.
+1)security --> users --> create user (so users will able to access Jenkins) --> we can delete users also
+
+2) ec2-44-204-74-84.compute-1.amazonaws.com:8080/ (created instance with port number) (in separate browser)
+to get other users access our jenkins
+
+
+05th march 2025
+===============
+
+==> ssh port number: 22
+
+Manage Jenkins:
+================
+
+manage Jenkins --> security
+Anonymous --> no need to give any access
+
+Authentication vs Authorization:
+
+Authentication: means giving identity or creating users.
+Authorization: Giving right access to them
+ SDLC Golden principle: theory of least privilege.
+
+In matrix based only, Authenticated users --> at least read access to give otherwise it will come out from Jenkins.
+
+Authorization types:
+matrix : based on user if you give access --> user level access
+project based : based on job if you give access. no need to select anonymous and authenticated users.--> project level access
+role based: based on the role if you give access by making them groups.--> group level access
+eg: developers, QA team, DevOps, manager
+
+role based by default ga ledu, so manage jenkins--> plugins --> role-based authorization strategy.
+
+Tools and actions:
+prepare for shutdown: eg: use cause is when Jenkins is under maintenance. it stops users from executing new builds.
+
+access denied/overall read/view permissions error: when users have lack of necessary permissions
+
+6th march 2025
+===========
+
+managed jenkins-->System Configuration
+1)System:
+
+Jenkins home directory path: /var/lib/Jenkins
+System message: displays on the Jenkins page
+build executor builds the jobs
+# of executors --> number of executors
+
+Quiet period: gap between build to build to create.
+SCM checkout retry count: Jenkins checks the code in SCM by retrying again if it face any issue with internet.
+it checks by retrying again based on the number you give.
+
+System admin email address: auto or system generated messages (eg: no reply@gmail.com)
+
+2) Tools: you can configure tools, and do installation automatically.
+
+
+1)how many ways can we build Jenkins
+
+10th march 2025
+===============
+create a ci/cd project --> configure
+
+yum install git -y
+
+build periodically --> cron job/cron tab
+UTC timings
+
+bottom to top
+============
+*  --> day of week (0-6)
+* ---> month (1-12)
+* --> day of month (1-31)
+*  --> hour (0-23)
+* --> min (0-59)
+
+0-sun, 1-mon, 2-tues, 3-wed, 4-thurs, 5-fri, 6-sat
+
+every minute --> *
+every means "*"
+
+eg: oct 2nd 8:30 am
+  
+30 8 2 10 *
+
+
+jan 26, 08:10 pm
+
+10 20 26 1 *
+
+every 10 min --> 10 * * * *
+every min --> * * * * *
+
+=============
+poll SCM --> if any changes in the source code, then only it will trigger build.
+it builds only, if any changes made in a project otherwise it will not build.
+* * * * * --> it polls for every minute
+
+Build using maven:
+==================
+after started the Jenkins.
+
+cd /var/lib/Jenkins/workspace/<project_name/job_name>
+(then start maven and nex+t steps)
+
+Build steps--> Execute shell-->mvn clean install (error: mvn not found)
+yum install maven -y
+
+(need to get repo contains pom.xml file, then it will generate a artifact in workspace (target folder) in .war format.)
+
+Note: If any error found in Jenkins job, i will see console output.)
+
+wget --> download file from web.
+tomcat download --> zip, tar
+
+extract: zip--> unzip
+         tar --> tar -xvf folder.tar.gz
+
+cd /opt/
+
+wget <copy tar link address>
+
+unzip 
+cd apache-tomcat-9.0.102/
+ll
+ll bin/
+
+cd ../
+rm -rf *
+
+zip --> suitable for windows
+tar --> for Linux
+
+wget <copy tar link address>
+extract using tar -xvf folder.tar.gz command
+
+cd apache-tomcat-9.0.102/
+ll
+ll bin/
+ll /conf
+here, server.xml is there, here we can change port numbers
+
+webapps --> contains artifacts
+
+cd conf/
+ll
+vim server.xml
+
+(to change port to 8081)
+
+rm -rf tomcat-users.xml
+vim tomcat-users.xml
+
+======tomcat users configuration-======== 
+
+<?xml version="1.0" encoding="utf-8"?>
+<tomcat-users>
+<role rolename="manager-gui"/>
+<user username="tomcat" password="tomcat" roles="manager-gui, manager-script, manager-status"/>
+</tomcat-users>
+
+cd ..
+cd webapps/
+cd manager
+cd META-INF
+ll (contect.xml)
+
+vim contect.xml (we can see 127\.d+\. it means local server)
+to allow any server, we need to keep ".*"
+
+cd ../../../
+[root@jenkinsserver apache-tomcat-9.0.102] ll
+
+cd bin/
+ll
+to start shell script (./startup.sh)
+
+http://ec2-54-152-188-75.compute-1.amazonaws.com:8081/
+(able to access tomcat on the same server with port 8081)
+
+how to go tomcat
+(manager, it asks username and password (tomcat))
+choose file (deploy) --> manually
+
+using Jenkins:
+
+11th march 2025
+===============
+1)create separate instances for Jenkins and tomcat
+2) connect to the instance
+3) install Jenkins on Jenkins server
+4) download tomcat on tomcat server
+  cd /opt --> need to do everything in /opt in tomcat server
+(google --> apache tomcat download --> copy tar link address and paste using wget command )
+wget <link>
+ll
+tar -xvf <fname> (to extract)
+ll
+cd apache-tomcat-9.0.102
+ll
+(we can see bin, conf, lib, logs, temp, webapps, work)
+
+tomcat is a java based software, so we need to install before working on tomcat.
+
+5) install java using (yum install java -y) after changed to cd /bin
+6) public ip of tomcat server:8080
+tomcat installation successful
+
+7) to access tomcat, need to change this to access from outside of server also.
+
+cd webapps
+cd manager
+cd META-INF
+ll
+context.xml 
+vim context.xml
+(allow --> ".*")
+
+8) set users:
+cd conf/
+ll
+
+(same server --> need to change port in server.xml )
+
+rm -rf tomcat-users.xml
+vim tomcat-users.xml
+===
+<?xml version="1.0" encoding="utf-8"?>
+<tomcat-users>
+<role rolename="manager-gui"/>
+<user username="tomcat" password="tomcat" roles="manager-gui, manager-script, manager-status"/>
+</tomcat-users>
+=====
+
+set username and password as tomcat
+
+9) cd bin/
+10) ./startup.sh (tomcat started)
+
+11) create a Jenkins job.
+12) fork repo from devopstraininghub (mindcircuit15d)
+13) job --> configure --> copy repo to git --> poll SCM  (* * * * *) --> build steps (mvn clean install)
+save
+
+build now
+in console output, we can see an artifact with .war is created in target folder.
+workspace/job/target/
+there we can keep and deploy in the tomcat page manually.
+
+14) automation move artifact (.war file) to tomcat page 
+ post build actions (add post-build action --> need to install plugin ( deploy to container))
+this plugin is installed to deploy .war files to containers (tomcat, Glass-fish, JBoss etc.,)
+
+15) **/*.war   --> keep under WAR/EAR files
+   tomcat 9.x remote --> under containers
+   
+(imp:  cred: tomcat
+context path: <>.war (we need to keep before .)
+
+
+Jenkins version upgrade
+=======================
+executable-war
+type below command in Jenkins -> cd /usr/share/java
+ll (you can see Jenkins.war file)
+
+google --> Jenkins war download --> download and deploy --> weekly releases
+(now we want to remove old Jenkins.war (2.492) and copy new Jenkins.war(2.501) to Jenkins.war
+
+systemctl stop jenkins
+
+take backup of that Jenkins.war file
+cp -rp Jenkins.war bkp_jenkins.war_16march2025
+ll
+
+rm -rf Jenkins.war
+ll
+
+wget <paste new version url>
+ll (2.501 version)
+
+systemctl start Jenkins
+
+rollback to previous version:
+---------------
+systemctl stop Jenkins
+ll
+rm -rf Jenkins.war
+ll
+(restore backup file using below command )
+mv bkp_jenkins.war_16march2025 Jenkins.war
+ll
+systemctl start Jenkins
+
+===============================
+
+
+12th march 2025
+==================
+jenkins-master slave configuration
+
+Jenkins master-slave distributed architecture used to distribute loads.
+slave or agents.
+==> no need to set up Jenkins in slave node. we need to set up remote agent in slave node.
+
+1) create an instance (Jenkins)
+2)connect to server, open Jenkins dashboard.
+3) create another instance for slave node (jenkins-slave1), connect and deploy in cd /tmp path.
+(Note: set number of executors to 0 in the master node for security purpose. you can build on slave nodes only)
+4) manage jenkins--> nodes--> add node(slave1)--> desc (slave1) --> no.of executors (3)--> remote root directory (/tmp)
+Note: /tmp --> has no permission issues
+labels --> slave1
+
+connect master node with slave node:
+launch method --> launch agent via SSH
+
+credentials:
+ssh username with private key
+
+host: ec2 --- com
+
+ID:DESC --> slave1
+
+username: ec2-user
+
+host key verification strategy: manually trusted key verification strategy
+Availability: keep as much as possible
+
+yum install java -y
+
+(to get slave node online with remote artifact)
+
+yum install maven -y
+
+
+restarting Jenkins
+====================
+systemctl restart Jenkins  --> CLI
+
+restart through GUI using browser
+-----------------------
+
+ec2-54-224-205-163.compute-1.amazonaws.com:8080/restart  --> hard restart (not recommendable) (it restarts forcefully even builds are in running state)
+
+ec2-54-224-205-163.compute-1.amazonaws.com:8080/safeRestart
+(pause jobs and restart once all running jobs are either finished or paused.
+--> jobs on slave nodes can continue.
+
+kill -9 pid  (hard killing)
+ps -ef: get all process in the server
+ps -ef | grep Jenkins  (find Jenkins related processes)
+
+kill Jenkins in hard way
+
+
+13th march 2025
+================
+pipeline configuration
+
+Pipeline as a script
+
+previously we practiced CI/CD, using freestyle project--> GUI of Jenkins
+
+========
+Git Clone
+mvn clean install - Artifact(.war) -> build
+deploy (tomcat)
+==========
+Pipeline: one stage output is another stage's input
+
+now, we are practicing CI/CD using pipeline
+
+Pipeline as a code: Groovy script.
+1)declaration pipeline
+2)scripted pipeline
+
+Note: ps -ef | grep tomcat  (to know tomcat is running or not)
+
+create an item --> cicd pipeline
+
+pipeline script
+================
+pipeline {
+    agent any or label of that slave (e.g: slave1)
+
+    stages {
+        
+        stage ('Hello') {
+	    steps {
+		echo 'Hello World'
+	    }
+	}
+   }
+}
+
+===================
+(echo : print on the screen
+eg: echo hyma
+o/p: hyma)
+
+=======================
+eg:
+
+pipeline {
+    agent any
+
+    stages {
+        stage('clone GIT Repo') {
+            steps {
+                echo 'Cloning code from GitHub Repo'
+		        git branch: 'main', url: 'https://github.com/hymamedagam/hyma_mindcircuit15d.git'
+	        }
+	    }
+	    stage('Build Artifact') {
+	        steps {
+	            echo 'Build Artifact using maven build tool'
+		        sh 'mvn clean install'
+	        }
+	    }
+	    stage('Deploy to Tomcat') {
+	        steps {
+	            echo 'Deploying artifact on to Tomcat'
+		        deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://ec2-3-87-100-51.compute-1.amazonaws.com:8081/')], contextPath: 'b15-insta', war: '**/*.war'
+	        }
+	    }
+    }
+}
+
+
+manage Jenkins --> plugins -->pipeline: stage view plugin and Blue Ocean install (pipeline pictorial representation)
+
+
+
+14th march 2025--> No class
+
+15-linux deep dive
+16 -sunday
+
+17th march 2025- Jenkins backup and quiz
+==========
+install backup, thin backup and periodic backup plugins
+
+==> backup manager
+set
+backup
+save
+
+if you unable to backup the job, give full permissions to 
+/var/lib/
+
+17t march 2025
+==========
+backup of a job and quiz
+
+
