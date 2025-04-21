@@ -1,0 +1,1814 @@
+25-march-2025 
+
+evaluation of docker:
+
+Docker: container solution
+(code worked in lab env but failed in prod Linux env due to difference in dependencies,libraries,binaries, runtime)
+
+Docker Hub: application code, dependencies, libraries are packed and form a light weight image (docker image) and placed in Docker Hub.
+
+Build once Run anywhere
+
+container is a process.
+
+Docker container is a light weight process.
+
+docker container takes the image from guest OS.
+
+docker came from word dockyard
+virtualization vs containerization
+
+
+1) If we buy a physical server to run the application, we need to adjust RAM,CPU and storage. we need to install OS.
+cost, time --> high and resource utilization --> less
+
+lack of security: if an application is running in a server, installing Jenkins, tomcat and nexus in the same server caused the security will compromise. if any restarts or modifications to Jenkins, tomcat or anything will also effects the another application.
+
+Hence, virtualization came into the picture.
+
+2) Virtualization: multiple virtual servers run in a single physical hardware, and they are isolated.
+
+if we keep different applications on different servers,
+eg: Jenkins in one sever, application in another server, tomcat in another server. if any issue happens to Jenkins then that server or instance only down, remaining are not affected.
+
+each VM contains their own OS.
+
+code success in lab env and failed in prod env.
+the successful code along with it's dependencies, binaries are packed into a lightweight image and place in docker hub or docker registry.
+
+3)containerization:
+
+when you run a container image then container will be created.
+
+docker container takes the image from Guest OS.
+
+========
+1) create EC2 instance
+and install docker
+
+note: yum install docker -y
+if docker exists in yum package, then it is installed.
+otherwise, we will get it from web
+
+cd /etc/yum.repos.d
+
+yum install docker -y
+
+cd
+
+docker --version
+docker info
+========
+we will get below error
+Server:
+ERROR: Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?
+============
+
+systemctl status docker  
+ (inactive state)
+
+systemctl start docker
+systemctl status docker
+
+(active state)
+
+containers are isolated the reason is they have control groups and namespaces in it.
+
+========================
+
+26th march 2025
+===============
+
+1) connect  to docker server
+2) install docker
+3) docker --version or docker -v
+4) docker info
+docker rm -f $(docker ps -aq)
+docker rmi -f $(docker images -q)
+5) docker images: to check if any images are available
+
+
+Note: GitHub: repository for code
+      Nexus: repository for artifacts
+      DockerHub: repository for docker images
+
+Create a DockerHub account.
+
+6) docker search amazonlinux
+7) docker pull amazonlinux
+8) docker images
+9)docker run <image name with tag> or <image id>  (create a container)and it will exit immediately if we don't give 'it'
+docker run amazonlinux:latest or <imageid>
+
+10) docker ps -a
+11) docker run -it amazonlinux:latest
+(it -> interactive terminal)
+it will go to bash
+exit
+docker ps -a
+docker run -it --name cont1 <image id>
+bash
+(========)
+docker ps -a
+docker rename trusting_lampot cont2
+docker ps -a
+12) docker start <container name> or <container id>
+13) docker stop cont2
+docker ps -a
+
+14) docker pause cont1
+docker ps -a
+
+docker unpause cont1
+
+15)docker ps -a (all running and stopped processes info)
+16) docker ps (only running processes)
+
+17) docker run -it --name cont4 amazonlinux
+ ctrl+p+q
+(do not stop and exit)
+
+18) yum install git -y (inside bash)
+ctrl+p+q
+19) docker attach cont4 (it will connect  to main processes)
+docker ps 
+20) docker exec -it cont4 /bin/bash
+( without attaching to main process, we are connecting to another terminal or process)
+
+21) docker rm <containerid>
+22) docker rm -f <cid>
+23) docker rmi <imageid>
+(unable to delete because this image is used by running containers, so we need to delete that container first, later image)
+
+docker rmi -f <imageid>
+
+docker commit cont1 (create image from container)
+docker images 
+(Giving name and tag to image) 
+
+docker tag iid <reponame>:<tag>
+docker ps -al --> latest container
+docker top cont7 --> displays running processes of a container
+docker run -itd --name <container_name> <iid/imagename> : itd used for container is in running state with detached mode (not enter into the internal terminal but it is in running state)
+docker ps -aq --> (displays only container id's)
+docker ps -al: displays latest containers
+
+docker stats  cid -->      Display a live stream of container(s) resource usage statistics
+docker top  cid -->         Display the running processes of a container
+
+docker ps -aq --> displays only container id's
+docker images -q --> displays only images id's
+
+docker rm -f $(docker ps -aq)
+docker rmi -f $(docker images -q)
+
+tasks: create dockerhub account
+practice docker commands
+
+27th march 2025
+==================
+dockerhub account creation 
+creation of image repo in dockerhub account
+docker image push to -Image repo in your DockerHub account
+======================
+
+
+1) connect to docker server
+ install docker
+
+if we stop and start the server or VM, docker service is not starting in booting.
+from next time if we stop and start VM, docker also start in booting level, we need to enable docker in booting level.
+
+systemctl enable docker
+systemctl start docker
+systemctl status docker
+
+docker images
+docker ps -a
+
+delete all existing images and containers.
+
+docker rm -f $(docker ps -aq) --> deleting all containers (we get all container id's)
+docker rmi $(docker images -q) --> deleting all images (we get all images id's)
+
+create a repository in docker Hub
+
+docker images
+
+docker run --name cont1 amazonlinux
+(it is unable to find image 'amazonlinux:latest' locally.
+pulling from remote repo library/amazonlinux)
+
+docker ps -a
+
+(container created but exited immediately, container is a process, it will exit after the assigned task is completed)
+
+docker run -it --name cont2 amazonlinux
+
+(running an interactive container, such as shell session)
+(container (cont2) up and running mode, and in interactive way (inside the terminal))
+
+docker run -itd --name cont3 amazonlinux
+(running a container interactively in the background)
+(cont3 created , but not exited (it's up and running), and it is in detached mode (interactive way, not inside the terminal)
+
+docker ps -a
+
+docker run -it --name cont3 amazonlinux sleep 10   --> container created and exited after 10 seconds.
+docker ps -a
+
+docker run -itd --name cont4 amazonlinux sleep 20
+docker ps -a
+(container created and exited after 20 seconds.)
+
+docker run -it --name cont5 amazonlinux
+yum install git -y
+
+git --version
+
+ctrl+p+q (am not stopping container)
+
+docker ps
+
+docker commit cont5 (creating custom image from cont5 as it contains git)
+docker images
+docker tag amazonlinux:git <iid>
+docker images
+
+(push this image to our dockur hub repo)
+
+docker push devopshubg333/batch15d:tagname
+(we will get permission denied error)
+
+docker login  ( give username and password)
+login succeed
+
+docker push devopshubg333/batch15d:tagname
+
+docker images
+
+docker tag <iid> devopshubg333/batch15d:git
+docker images
+
+docker push devopshubg333/batch15d:git
+
+(custom image with git pushed to docker hub repo)
+
+docker rm -f $(docker ps -aq)
+docker rmi -f $(docker images -q)
+(all images and containers deleted)
+
+docker images
+(no images)
+
+docker pull devopshubg333/batch15d:git
+(image with git is downloaded )
+
+docker images
+docker run -it --name c1 devopshubg333/batch15d:git
+bash: git --version
+exit
+
+==============================
+LAUNCHING WEB APPLICATION
+==========================
+how to launch an application in web 
+httpd --> web server package
+install web package "httpd" in Linux server
+
+yum install httpd -y
+systemctl status httpd
+systemctl start httpd
+systemctl status httpd
+
+
+deploy application in web server by following below path.
+cd /var/www/htmlvim index.html
+access through port :80
+publicip:80
+
+httpd port listens on 80
+(all this is done in VM)
+
+=========================
+LAUNCHING WEB APPLICATION USING DOCKER
+=====================
+connect to docker server
+create a container
+bash: yum install httpd -y
+systemctl start httpd
+(we will get an error)
+(system has not been booted --error)
+
+cd /usr/sbin/  (root users home directory)(if systemctl command not work then we can start this from root users bin
+
+ls
+
+./httpd
+
+cd /var/www/html/
+
+vim index.html
+(vim:command not found)
+
+yum install vim -y
+
+vim index.html
+esc-->i
+
+Hello, this is facebook page from a container
+
+esc:wq
+
+ctrl+p+q
+
+docker ps
+
+(how to access application or service running in a container on web with which port)
+docker ps
+
+Note: we used publicip:80 when the application is on server.
+now, we need to access the application in container on web.
+
+port mapping:
+==============
+port maping /port forwards 
+
+docker run -it --name <contname> -p HP:CP amazonlinux 
+HP: Host port
+CP: Container port
+===============
+docker run -it --name fb_httpd_cont2 -p 8081:80 amazonlinux
+yum install httpd -y
+cd /usr/sbin/ (systemctl is not working here so we go to root users home directory and start from bin)
+ls
+./httpd 
+yum install vim -y
+vim /var/www/html/index.html/
+hi, this is FB page serving from docker container
+
+ctrl+p+q
+
+access using publicip:8081
+docker ps
+======================
+
+Method-1)if developers want to change the code, they can change it in two ways
+
+1)go to the container,
+
+docker exec -it fb_httpd_cont2 /bin/bash
+cd /var/www/html
+ls
+vim index.html
+(edit here)
+exit
+docker ps
+
+method-2)
+ll
+(index.html)
+cp -rp index.html /opt/
+cd /opt/
+ll
+(index.html)
+
+2)copy code from docker host to container
+
+docker cp src dest
+
+docker cp index.html fb_httpd_cont2:/var/www/html/index.html (copy code from docker host to container)
+
+(here index.html (from docker host) copied to container
+=========================
+docker pull ubuntu
+docker run -it --name cont1 ubuntu
+-------
+whoami
+ll
+hostname
+-------
+create our own custom user
+
+useradd hyma
+cat /etc/passwd
+
+ctl+P+Q
+
+docker ps
+
+docker exec -it -u hyma cont1 /bin/bash
+(login with user)
+ctrl+p+q
+
+docker run -it --name c4 -h httpdserver ubuntu  (change hostname in process)
+
+
+28th march 2025: Docker file
+==============
+
+connect to docker
+install docker and enable it
+(yum install docker -y && systemctl  status docker)
+
+docker images
+
+docker run -it --name httpdcont -p 8081:80 amazonlinux
+yum install httpd -y
+systemctl start httpd (it won't work)
+cd /usr/sbin/
+ls
+./httpd
+
+cd /var/www/html
+ls
+yum install vim -y
+vim index.html
+(this is fb page served by docker container)
+
+access through public ip or hostname:8081
+(application is dockerized or containerised)
+
+ctrl+p+q
+
+docker ps
+
+(now create an image from httpd container) and push it to docker hub.
+docker commit httpdcont
+docker images
+docker tag <iid> devopshubg333/batch15d:httpd
+
+docker history <iid/iname>
+docker images
+docker login
+docker push devopshubg333/batch15d:httpd
+
+check logs in container
+====================
+docker ps
+docker logs <container_name or_container_id>
+
+cd /var/lib/docker (home directory of docker)
+ll
+docker images
+ll
+cd image/
+cd overlay2
+ll
+cd imagedb/
+cd content/
+ll
+cd sha256/
+ll
+
+docker images
+docker ps
+pwd
+docker run -itd --name ct1 ubuntu
+docker ps -a
+cd /var/lib/docker
+ls
+ll
+cd containers/
+ll
+docker ps -aq
+docker rm -f <cid>
+ll
+
+=======================
+========================================
+Docker Container - ephemeral nature : temporary
+
+
+Docker containers are ephemeral by design, meaning they are temporary and stateless. Once a container stops or is deleted, any data or changes made inside it during its runtime are lost unless explicitly preserved
+
+Docker volumes or Bind mounts:
+==============================
+(to preserve container's data using volumes by using volume mapping with container)
+
+cd /var/lib/docker
+ll
+cd volumes
+ll
+docker volume help
+
+(Usage:  docker volume COMMAND
+
+Manage volumes
+
+Commands:
+  create      Create a volume
+  inspect     Display detailed information on one or more volumes
+  ls          List volumes
+  prune       Remove unused local volumes
+  rm          Remove one or more volumes
+  update      Update a volume (cluster volumes only)
+
+Run 'docker volume COMMAND --help' for more information on a command.)
+
+docker volume create vol1
+ll
+docker volume create vol2
+ll
+
+cd vol1
+ll
+cd _data
+======================
+create a container and mapped to vol1 with container path:
+
+docker run -it --name c2 -v vol1:/opt/logs iname
+cd /opt/
+ls
+cd logs/
+ls
+create few files
+(eg: touch log1 log2 log3)
+ll
+
+(parallely open another git bash and connect to docker, and check in volumes
+ connect to docker
+ cd /var/lib/docker
+ ll
+ cd volumes
+ ll
+ cd vol1
+ ll
+ cd _data
+ (u can get log1 log2 log3 files here, that u created in container path as the vol1 is mapped to container)
+
+==================
+docker volume ls: lists volumes
+docker volume create: create volume
+docker volume inspect: display information about one or more volumes
+docker volume prune: Remove unused local volumes
+docker volume rm: Remove one or more volumes
+
+docker volume inspect vol1
+
+docker volume rm vol2 --> to delete volume
+docker volume rm vol1 --> (we can't delete, as vol1 is in use by00 a container)
+if we want to delete vol1, we need to delete container first.
+
+=============
+BIND MOUNTS 
+==============
+docker run -v /host/path:/container/path my-image
+
+-v HostVolumePATH:ContVolumePATH 
+
+docker run -it --name cont2 -v /opt:/app/logs iname
+
+(volume create chesi volume iste adhi volume mount, path create chesi path iste adhi bind mount.)
+0
+volume handled by the docker lifecycle.
+
+eg: docker run -it --name cont2 -v /opt:/app/logs amazonlinux
+ (first create few files in container path)
+ eg: bash-# cd app/
+	ls
+     bash-# cd logs
+	ls
+     bash-# touch f1 f2 f3 f4
+	ls
+(open another git bash and connect to docker server, and you can find the files created in container path to hostpath)
+cd /opt
+ll
+(if you add few files in docker host also, we can find those files in container path)
+
+exit
+================
+docker system prune -> remove stopped containers
+ (remove unused things/unused data --> use prune command)
+
+docker container prune --> remove all stopped containers
+docker images prune --> remove unused images
+
+
+=======================================
+
+docker system prune
+docker container prune
+docker image prune
+docker volume prune 
+
+==============================================
+
+how to know others about the images and containers which you created --> using docker file
+(eg: Jenkins free style project --> we only know what we have done to project or anything
+     Jenkins pipeline script --> others can see our script when we put in GitHub for versioning)
+
+Note: Jenkins
+ create a Jenkins file --> build it --> pipeline will trigger
+
+like that docker also,
+
+write docker file --> pass instructions and build --> docker image is created
+
+we can share the script to team for complex workflows.
+
+Jenkins pipeline and docker file are similar (important for peer review)
+
+============================
+Before writing a docker file, need to know manual steps.
+amazonlinux  (base image)
+yum install httpd -y
+/var/www/html/index.html
+/usr/sbin/httpd
+80
+=========================
+Docker file:
+(Docker file contains few basic instructions)
+
+FROM amazonlinux
+RUN yum install httpd -y
+COPY index.html /var/www/html/index.html
+CMD ["/usr/sbin/httpd","-D","FOREGROUND"]
+EXPOSE 80
+==================
+cd /opt/
+ll
+rm -rf *
+vim Dockerfile
+(FROM amazonlinux
+RUN yum install httpd -y
+COPY index.html /var/www/html/index.html
+CMD ["/usr/sbin/httpd"]
+EXPOSE 80)
+
+cat Dockerfile
+
+(Build a dockerfile)
+docker build -t testing:v1 -f Dockerfile .
+
+(will get an error because index.html is not found)
+vim index.html
+
+docker build -t testing:v1 -f Dockerfile .
+ (image is ready)
+docker images
+
+create container from the image 
+docker run -it --name cont1 -p 8082:80 testing:v1
+
+(cont1 created, but it is not accessible with port 80, because cont1 is stopped even though we gave -it.
+container stopped because it's task "/usr/sbin/httpd" is completed as it is running in background process)
+
+so, we need to do in foreground.
+
+(FROM amazonlinux
+RUN yum install httpd -y
+COPY index.html /var/www/html/index.html
+CMD ["/usr/sbin/httpd","-D","FOREGROUND"]
+EXPOSE 80
+)
+
+==========
+vim Docker file
+docker build -t devopshubg333/batch15d:httpd_amazonlinx -f Dockerfile .
+docker images
+docker run -it --name ct5 -p 8085:80 devopshubg333/batch15d:httpd_amazonlinx
+docker push devopshubg333/batch15d:httpd_amazonlinx
+ll
+
+(dockage image is placed in docker hub to review. docker file is placed in GitHub to review)
+
+docker push devopshubg333/batch15d:httpd_amazonlinx
+rm -rf index.html
+   ll
+    cat Dockerfile
+   history
+
+Now, we can delete index.html also, no need to use docker file also, simply pull the image and spin a container from it.
+
+Note: . refers where: here only. (build context)
+
+29th march 2025
+=================
+We can create image in two ways:
+1) we can create image from container by committing it.
+2) through a declarative file ( docker file ) with some instructions (FROM, RUN, CMD, COPY, EXPOSE, ADD, ENTRYPOINT)																								
+==================
+
+--> connect to docker server
+--> systemctl status docker (if it is inactive(dead), then enable docker in booting)
+--> systemctl start docker
+--> systemctl enable docker (this command is used to enable docker service in booting while starting docker server)
+--> docker images
+--> docker ps -a
+--> docker system prune
+--> docker ps -a
+--> docker rmi -f $(docker images -q)
+--> docker images
+--> cd /opt/
+ (Dockerfile, containerd)
+--> cat Dockerfile
+--> rm -rf *
+-->ll
+--> docker images
+( i don't have dockerfile, and index.html file, but i have that image in dockerhub)
+--> docker run -itd --name fb -p 8081:80 devopshubg333/batch15d:httpd_amazonlinx
+(container created, access through public ip:8081)
+(it is accessible, because all the code, and it's dependencies are packaged into the image)
+
+--> docker images
+--> docker history <iid/iname:tag>
+
+RUN, COPY, ADD instructions--> size is added
+
+Dockerizing a sample python web application:
+================================================
+ll
+cd /opt/app.py
+
+--> vim app.py
+(add below python code for an application)
+
+import os
+from flask import Flask
+app = Flask(__name__)
+
+@app.route("/")
+def main():
+    return "Welcome to Batch15!"
+
+@app.route('/how are you')
+def hello():
+    return 'I am good, how about you?'
+
+if __name__ == "__main__":
+    app.run()
+
+
+
+==============
+Commands :
+
+yum update -y
+yum install python3 python3-pip pip -y
+pip install flask
+FLASK_APP=/opt/app.py flask run --host=0.0.0.0 --port=8080 (0.0.0.0 means anywhere, we can access it through port 8080)
+
+================================
+(access application through public Ip/hostname: port (8080)
+output: welcome to Batch15!
+hostname:8080/how are you
+output: I am good, how about you
+
+(Developers gave you KT, and informed you to dockerize it. you need to create a docker image using dockerfile)
+
+================================
+================================
+Note: Docker file --> Docker image --> Docker container --> access application through port
+Dockerfile : ( 1. if OS is amazonlinux :) 
+
+FROM amazonlinux
+LABEL maintainer="MADHU KIRAN <devopstraininghub@gmail.com>"
+RUN yum install python3 python3-pip pip -y
+RUN pip install flask
+COPY app.py /opt/app.py 
+CMD FLASK_APP=/opt/app.py flask run --host=0.0.0.0 --port=8080
+EXPOSE 8080
+
+vim Dockerfile
+(put above code)
+
+docker build -t testimage:v1 -f Dockerfile .
+docker images
+docker run -it --name pyct1 -p 8085:8080 testimage:v1
+
+(access using hostname:8080)
+we have successfully created a docker image
+
+--> docker tag <iid> devopshubg333/batch15d:python_flaskapp
+--> docker images
+--> docker push devopshubg333/batch15d:pythonn_flaskapp
+--> docker images
+--> docker history devopshubg333/batch15d:python_flaskapp
+
+
+=============================================================================================
+
+2. if OS is ubuntu :
+
+FROM ubuntu:latest
+LABEL maintainer="KIRAN <devopstraininghub@gmail.com>"
+
+# Update the package list and install necessary dependencies
+RUN apt-get update -y && apt-get install -y python3 python3-pip
+
+# Install Flask via pip
+RUN pip3 install flask
+
+# Copy your app.py into the container
+COPY app.py /opt/app.py
+
+# Set the environment variable for Flask app and run the Flask server
+CMD FLASK_APP=/opt/app.py flask run --host=0.0.0.0 --port=8080
+
+# Expose the port Flask will run on
+EXPOSE 8080
+
+----------------------------------------------
+----------------------------------------------
+3. Dockerfile using python base image :
+
+FROM python:3.9
+
+# Copy the Flask application file to the container
+COPY app.py /opt/app.py
+
+# Set the FLASK_APP environment variable
+ENV FLASK_APP=/opt/app.py
+
+# Expose the port on which the Flask application will run
+EXPOSE 8080
+
+# Run the Flask application
+CMD ["flask", "run", "--host=0.0.0.0", "--port=8080"]
+
+
+CMD FLASK_APP=/opt/app.py flask run --host=0.0.0.0 --port=8080
+
+===========================================
+DOCKERFILE INSTUCTIONS DEEP DIVE :
+
+FROM --> for base image
+RUN --> to install some packages in the image
+COPY --> copy from docker host to image file system (locally)
+ADD --> copy from remote to image (remotely., files or code in internet)
+COPY VS ADD 
+
+CMD --> CMD is a default instruction that will be executed when a container starts, and we can override it.
+If docker file contains multiple CMD instructions, latest CMD will be executed.
+
+ENTRYPOINT --> it has high priority compared to CMD, and we can not override it. but APPENDED
+
+WORKDIR
+LABEL
+EXPOSE
+ARG 
+ENV
+
+ADD 
+
+ 
+RUN VS 
+CMD VS ENTRY POINT 
+------------
+cat Dockerfile 
+FROM amazonlinux 
+RUN  yum install iputils -y   (installing ping package)
+ENTRYPOINT ["ping"]
+CMD ["www.google.com"]
+-------------------
+
+
+RUN executes command(s) in a new layer and creates a new image. E.g., it is often used for installing software packages
+
+CMD sets default command and/or parameters, which can be overwritten from command line when docker container runs
+
+RUN - DURING IMAGE BUILDING 
+----------
+CMD - DURING CONTAINER CREATIING  - default instruction and we can override it 
+
+
+ENTRYPOINT configures a container that will run as an executable – can not be overridden but APPENDED & GIVEN HIGH PRIORITY 
+
+exec 
+------------------------------
+
+COPY - COPY  SRC TO DEST ( LOCALLY ) 
+ADD -  REMOTE URL CAN ALSO BE COPIED 
+
+30&31st --> no class
+===========================================
+
+01-april-2025
+=================
+
+Tomcat Dockerfile:
+=================
+
+instead of using git bash, we are using new ssh client (mobaxterm)
+google --> mobaxterm download --> Free --> download and install
+MobaXterm is better than Git bash and putty.
+MobaXterm has enhanced features, friendly UI, and importantly we can connect thorough any SSH client protocols.
+Open MobaXterm --> session --> SSH --> Remote host (public ip/hostname/dns server of an instance)--> specify usernaaame(ec2-user)-->port (22)
+Note: 22 is the port number for SSH client
+(How to connect to private key)
+Advanced settings --> use private key (select it) and browse --> click on 'OK'.
+Now we successfully connected to server
+
+--> yum install docker -y
+docker -v
+systemctl start docker
+systemctl status docker
+docker images
+docker ps -a
+cd /opt
+
+Tomcat started- manual process
+==============================
+1) google search--> tomcat download 
+--> yum install java -y
+-->wget (copy tomcat tar.gz link)
+--> tar -xvf apache-tomcat-9.0.102
+--> cd apache-tomcat-9.0.102
+--> ll
+--> set access to all
+cd webaapps/
+ll
+cd manager
+ll
+cd META-INF
+ll
+vim context.html
+ (.*)
+ll
+cd ../../../
+cd conf/
+(set users)
+rm -rf tomcat-users.xml
+ll
+vim tomcat-users.xml
+(<?xml version="1.0" encoding="utf-8"?>
+<tomcat-users>
+<role rolename="manager-gui"/>
+<user username="tomcat" password="tomcat" roles="manager-gui, manager-script, manager-status"/>
+</tomcat-users>
+)
+
+ll
+
+(we can change the port number in server.xml)
+cd ../bin/
+./startup.sh
+(Tomcat started)
+
+history
+
+cd ../
+ll
+cd ../
+ll
+opt]# rm -rf *
+opt]# ll
+
+=================================
+
+Tomcat Docker file:
+========================
+vim Dockerfile.tomcat
+============
+FROM amazonlinux:latest
+LABEL maintainer="madhu <devopstraininghub@gmail.com>"
+RUN yum install java -y && yum install tar gzip -y
+WORKDIR /opt
+ADD https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.102/bin/apache-tomcat-9.0.102.tar.gz .
+
+# Extract the tar.gz file
+RUN tar -xvf apache-tomcat-9.0.102.tar.gz && rm apache-tomcat-9.0.102.tar.gz
+
+
+RUN sed -i 's/"127\\.\\d+\\.\\d+\\.\\d+|::1|0:0:0:0:0:0:0:1"/".*"/g' /opt/apache-tomcat-9.0.102/webapps/manager/META-INF/context.xml
+WORKDIR /opt/apache-tomcat-9.0.102/conf/
+RUN rm -rf tomcat-users.xml
+RUN  echo '<?xml version="1.0" encoding="utf-8"?> \
+        <tomcat-users> \
+        <role rolename="manager-gui"/> \
+        <user username="tomcat" password="tomcat" roles="manager-gui, manager-script, manager-status"/> \
+        </tomcat-users>' > tomcat-users.xml
+
+CMD ["/opt/apache-tomcat-9.0.102/bin/catalina.sh", "run"]
+
+EXPOSE 8080
+==========
+esc:wq
+
+ctrl+c : stop it as tomcat is running in foreground process
+
+[root@ip-172-31-86-3 opt]# cat Dockerfile.tomcat
+
+
+===========================================================================
+
+Note: if give /bin/startup.sh --> tomcat will start in background process and exit in container
+for that, we need to run the tomcat in foreground process.
+
+Catalina.sh --> ./Catalina.sh
+run --> start tomcat in the current window
+
+./Catalina.sh start--> start the tomcat
+./Catalina.sh stop --> stops the tomcat
+
+====================================
+(Build tomcat image and create container and access tomcat)
+
+opt]# docker build -t tomcatimg -f Dockerfile.tomcat .
+docker images
+docker history tomcatimg
+docker run -it --name tomcat_ct1 -p 8081:8080 tomcatimg
+(access tomcat with public ip:8081)
+ctrl+p+q
+docker ps -a
+history
+docker images
+docker run -itd --name tct2 -p 8082:8080 tomcatimg
+(tomcat is running)
+==============================================
+
+Jenkins- Image
+==============
+(download Jenkins image)
+
+docker pull jenkins/jenkins:lts
+docker images
+docker run -it --name jenkins_ct1 -p 8083:8080 jenkins/jenkins:lts
+(access Jenkins through hostname:8083)
+it also contains Jenkins user admin password.
+
+===================
+1) create a Jenkins job with pipeline project
+2) paste Jenkins file (mindcircuit15d) in pipeline script and modify related urls.
+3)plugins --> pipelinestage and Blue ocean, deploy to container install
+4) manage Jenkins --> credentials --> username with password --> tomcat
+build now (we will get an error: git is there in docker image, but maven is not installed in Jenkins docker image)
+
+5) docker ps
+6) docker exec -it jenkins_ct1 /bin/bash
+   yum install maven
+or
+
+manage Jenkins --> tools --> maven install automatically (Maven_3.9.9)
+
+We need to tell where the maven is installed.
+
+===========
+Copy this in pipeline script
+=========
+
+tools {
+  maven 'Maven_3.9.9'
+}
+
+=========
+
+pipeline {
+    agent any
+    tools {
+      maven'Maven_3.9.9'
+    }
+
+    stages {
+	
+        stage('CLONE GITHUB CODE') {
+            steps {
+                echo 'In this stage code will be clone'
+				git branch: 'main', url: 'https://github.com/devopstraininghub/mindcircuit15d.git'
+				
+				}
+        }
+		
+        stage('BUILDING THE CODE') {
+            steps {
+                echo 'In this stage code will be build and mvn artifact will be generated'
+				sh 'mvn clean install '
+				
+            }
+        }		
+		
+        stage('DEPLOY') {
+            steps {
+                echo 'In this stage .war artiface will be deployed on to tomcat '
+				deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://ec2-18-205-235-108.compute-1.amazonaws.com:8081/')], contextPath: 'mcapp', war: '**/*.war'
+				
+            }
+        }		
+		
+		
+    }
+}
+
+April-02
+======================
+Containerize entire application in manual process:
+========================
+
+--> connect to ec2 instance
+--> cd /opt
+--> git clone <mindcircuit15d GitHub url>
+-->ll (mindcircuit15d)
+--> install maven and java
+-->yum install maven -y
+-->ll
+-->mvn clean install
+-->ll
+--> cd target/
+--> ll (.war file is created)
+-->cd ../../../ 
+#opt
+--> setup tomcat
+cd /opt
+sudo wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.102/bin/apache-tomcat-9.0.102.tar.gz
+sudo tar -xvf /opt/apache-tomcat-9.0.102.tar.gz
+cd /opt/apache-tomcat-9.0.102/webapps/manager/META-INF
+sudo sed -i 's/"127\\.\\d+\\.\\d+\\.\\d+|::1|0:0:0:0:0:0:0:1"/".*"/g' context.xml
+cd /opt/apache-tomcat-9.0.102/conf
+sudo mv tomcat-users.xml tomcat-users_bkup_18mar2025.xml
+sudo echo '<?xml version="1.0" encoding="utf-8"?>
+        <tomcat-users>
+        <role rolename="manager-gui"/>
+        <user username="tomcat" password="tomcat" roles="manager-gui, manager-script, manager-status"/>
+        </tomcat-users>' > tomcat-users.xml
+cd /opt/apache-tomcat-9.0.102/conf/
+sudo sed -i 's/Connector port="8080"/Connector port="8090"/g' server.xml
+sudo /opt/apache-tomcat-9.0.102/bin/startup.sh
+
+
+cd /opt
+ll
+
+access tomcat using port 8090
+
+cd mindcircuit15d
+ll
+cd target/
+ll
+mv mindcircuit15d-2.2.0.war /opt/apache-tomcat-9.0.102/webapps/.
+
+(refresh tomcat page we can see the application)
+cd /opt/apache-tomcat-9.0.102/webapps/
+
+==> but now i want entire application directly on web without opening tomcat page first.
+
+#webapps]  cd /opt/apache-omcat-9.0.102/bin
+     cd ./shutdown.sh
+  cd /opt/apache-tomcat-9.0.102/webapps/
+webapps]# rm -rf ROOT/
+ll
+mv mindcircuit15d-2.2.0 ROOT
+ll
+
+cd /opt/apache-tomcat-9.0.102/bin
+./startup.sh
+
+(refresh tomcat page, we can access application directly)
+==================================
+
+
+Multi stage Dockerfiles: to dockerize(or containerize) entire application
+=======================
+
+Image --> surface area size should always be small so that containers will spin up quickly and more secure, less vulnerabilities.
+SMALL IMAGES - BETTER SECURITY -- FAST SPIN UP & DEPLOYMENT 
+
+IMAGE OPTIMIZATION : 
+
+MINIMAL OS IN DOCKER IAMGES -- BASE IMAGE
+
+------------ 
+USE MINIMAL BASE IMAGE / DISTROLESS IMAGES
+
+MULTISTAGE DOCKERFILE & DISTROLESS 
+==========================
+cd /opt
+rm -rf *
+ps -ef |grep tomcat
+kill -9 <pid>
+ll
+
+git clone <mindcircuit15d GitHub url>
+ll
+cd mindcircuit15d
+ll
+
+vim Dockerfile
+esc -->i
+
+##artifact build stage 
+FROM maven AS buildstage
+RUN mkdir /opt/mindcircuit15d
+WORKDIR /opt/mindcircuit15d
+COPY . .
+RUN mvn clean install    ## artifact -- .war 
+
+### tomcat deploy stage 
+FROM tomcat 
+WORKDIR webapps 
+COPY --from=buildstage /opt/mindcircuit15d/target/*.war .
+RUN rm -rf ROOT && mv *.war ROOT.war
+EXPOSE 8080
+
+esc:wq
+
+docker build -t hymavathimedagam/docker1repo:mcfbapp -f Dockerfile .
+docker images
+docker run -itd --name fbct1 -p 8082:8080 hymavathimedagam/docker1repo:mcfbapp
+(publicip:8082)
+docker login
+docker push hymavathimedagam/docker1repo:mcfbapp
+===============================================================
+
+03-april
+==============
+MULTI STAGE-DOCKER-NETWORK
+==========================
+--> manual process for accessing calculator app written in Go language.
+====================
+cd /opt
+mkdir calculatorapp
+ll
+cd calculatorapp
+ll
+vim calculator.go
+esc-->i
+(keep developers code here)
+===========
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+)
+
+func main() {
+	fmt.Println("HELLO BATCH15 AWS DEVOPS CHMAPS , I am a calculator app ....")
+
+	for {
+		// Read input from the user
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Enter any calculation (Example: 1 + 2 (or) 2 * 5 -> Please maintain spaces as shown in example): ")
+		text, _ := reader.ReadString('\n')
+
+		// Trim the newline character from the input
+		text = strings.TrimSpace(text)
+
+		// Check if the user entered "exit" to quit the program
+		if text == "exit" {
+			break
+		}
+
+		// Split the input into two parts: the left operand and the right operand
+		parts := strings.Split(text, " ")
+		if len(parts) != 3 {
+			fmt.Println("Invalid input. Try again.")
+			continue
+		}
+
+		// Convert the operands to integers
+		left, err := strconv.Atoi(parts[0])
+		if err != nil {
+			fmt.Println("Invalid input. Try again.")
+			continue
+		}
+		right, err := strconv.Atoi(parts[2])
+		if err != nil {
+			fmt.Println("Invalid input. Try again.")
+			continue
+		}
+
+		// Perform the calculation based on the operator
+		var result int
+		switch parts[1] {
+		case "+":
+			result = left + right
+		case "-":
+			result = left - right
+		case "*":
+			result = left * right
+		case "/":
+			result = left / right
+		default:
+			fmt.Println("Invalid operator. Try again.")
+			continue
+		}
+
+		// Print the result
+		fmt.Printf("Result: %d\n", result)
+	}
+}
+
+
+=============
+esc:wq
+
+-->yum update
+-->yum install go -y
+-->GO111MODULE=off
+-->ll
+-->go build calculator.go 
+-->ll (we will get executable binary --> calculator)
+--> ./calculator
+(now calculator app is accessible locally)
+======================
+
+Dockerize the above calculator app:
+===================
+calculator app]# rm -rf calculator
+ll
+vim Dockerfile
+esc --> i
+============
+FROM amazonlinux
+RUN yum update && yum install -y go
+ENV GO111MODULE=off
+WORKDIR /opt/calculatorapp
+COPY . .
+RUN go build calculator.go
+CMD ["/opt/calculatorapp/calculator"]
+----------
+
+esc:wq
+
+--> docker build -t calimg:v1 -f Dockerfile .
+--> docker images
+--> docker history <image_id>
+--> docker run --rm -it --name ct1 calculatoerapp:v1
+
+(we can access calculatorapp)
+-----------------------
+To optimize the above docker image (to reduce image size) we can use multi stage docker file here.
+
+vim Dockerfile.multistage
+esc-->i
+---------------
+FROM amazonlinux AS buildstage 
+RUN yum update && yum install -y go 
+ENV GO111MODULE=off
+WORKDIR /opt/calculatorapp
+COPY . .
+RUN go build calculator.go
+
+FROM scratch 
+COPY --from=buildstage /opt/calculatorapp/calculator /opt/calculatorapp/calculator
+ENTRYPOINT ["/opt/calculatorapp/calculator"]
+(Note: ENTRYPOINT --> we can not overridden)
+
+
+NOTE: scratch is 0 byte size image. nothing in it.
+
+-------------------------------------------
+esc:wq
+
+-->docker build -t calculatorapp:multistage_v2 -f Dockerfile.multistage .
+
+docker images
+docker run --rm -it --name ct2 calculatorapp:multistage_v2
+(we can access calculatorapp)
+
+(imp questions:=
+1) multi stage dockerfile
+2) docker image optimization)
+
+Multi stage build: optimizing docker files.
+--> multiple FROM statements in Dockerfile
+
+To achieve docker image optimization:
+
+1) Using distroless(distribution less)/minimal base images
+2) Multistage builds
+3) Minimizing the number of layers
+4) Understanding caching
+5) Using Dockerignore
+6) Keeping application data elsewhere
+
+-------------------------------------------
+code is in my GIT HUB - clone it 
+git clone https://github.com/devopstraininghub/multi-stage-dockerfileex.git
+
+Ref URLS :
+
+https://docs.docker.com/build/building/multi-stage/
+https://devopscube.com/reduce-docker-image-size/
+
+=======================================================================
+
+NETWORKS
+-----------
+eg: hostname -I : we will get private ip address of an ec-2 instance. these IPs, we got from NIC (network interface card)
+
+ifconfig: shows the status of network interface card
+ethernet 0
+
+if we install docker, we can see another virtual network interface card docker0
+
+--> dockr0 virtual network enables communication between docker host and containers
+docker0 acts like a bridge between docker host and containers
+--> three types of networks present in docker
+docker network ls
+1) bridge --> docker0 (default)
+2) host
+3) none
+overlay
+
+--> to check connection between container to container:
+command: ping5
+
+yum install ping -y (amazonlinux)
+apt-get update && apt-get install iputils-ping -y
+ping 172.17.0.2
+
+check connection between container to host:
+ping <private ip of instance)
+--> If you want to change the connection between container to container, don't use default virtual network (docker0).
+we need to create our own custom bridge network
+--> bridge is the default vpc/subnet
+--> docker network inspect bridge
+
+create custom container network:
+================
+docker network create testnw
+docker network ls
+docker network inspect testnw
+
+adjust our own subnet
+
+docker network create --subnet 10.81.0./16 batch15nw
+docker network ls
+docker network inspect batch15nnw
+docker run -it --name cc1 --network batch15nw ubuntu
+hostname -I
+docker run -it --name cc2 --network batch15nw ubuntu
+hostname - I
+docker run -it --name cc3 --network batch15nw --ip 10.81.8.88 ubuntu
+hostname -I
+
+apt update && apt install iputils-ping -y
+ping 10.81.0.2
+ping 172.17.0.2
+
+ping <private ip of instance>
+
+docker network ls
+docker network inspect batch15nw
+docker network rm <network name>
+Note: we need to delete the containers first, later network
+
+docker network rm testnw
+ifconfig
+host network is not a good practice.
+it directly get host access
+if we create a container with host network, we will get host ip
+
+docker run -it --name hostnw --network host ubuntu
+hostname -I
+
+exit
+docker network ls
+
+docker run -it --name ct1 --network none ubuntu
+hostname -I
+(we don't get any ip address associated with the container created under none network)
+
+docker inspect ct1
+
+Note: overlay --> enable communication between containers present in different docker hosts
+
+=====================================
+
+04th-April 2025
+=================
+DOCKER-COMPOSE
+================
+--> used for managing, multi-container applications.
+
+docker pull wordpress
+docker images
+docker run -itd --name wpct1 -p 8081:80 wordpress
+docker ps
+(word press application is accessible and now, we need to do DB up)
+
+Note: docker compose: container as a service
+
+===========
+
+--> (search docker compose installation on amazonlinux)
+sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose (giving executable permissions) )we can give +x or 700)
+docker-compose version
+
+=============
+
+cd /opt
+rm -rf *
+
+==================================
+docker-compose.yml /yaml
+
+vi docker-compose.yml
+
+
+version: "3.3"
+    
+services:
+  db:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    volumes:
+      - wordpress_data:/var/www/html
+    ports:
+      - "8000:80"
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+volumes:
+  db_data: {}
+  wordpress_data: {}
+  
+=========
+  docker-compose up -d
+  docker ps -a
+  (access application with port number)
+
+==> we linked application container with db container using docker compose.
+
+docker network ls
+docker network inspect opt_deafult
+(we can see two ips for different containers (db and application containers))
+docker volume ls
+docker-compose down--> it stops and removes containers, networks, and volumes 
+if volumes not deleted then use below command,
+docker-compose down --volumes
+ll
+
+
+eg:2) github--> opentelemetry-demo
+it is an e-commerce website
+
+cd /opt
+ll
+yum install git -y
+git clone <opentelemetry GitHub code url>
+ll
+cd opentelemetry-demo
+ll
+(here we can see src (code exists))
+docker-compose up -d
+
+(container, network, and volumes created as per the docker-compose.yml file)
+
+docker ps 
+access e-commerce application with public ip:port number
+publicip: 8080
+
+Note: opentelemetry is a astronomy related 
+
+5,6--> no class
+7th api --> quiz explanation
+
+
+08-April-2025
+=============
+
+Security tools:
+
+SonarQube & Trivy: open source tools to identify vulnerabilities and used to continuously inspect the quality of code in software projects.
+SonarQube port : 9000
+--> it detects issues, ensure code is clean, maintainable, and secure
+--> static code analysis tool
+--> if quality gates passed, ci/cd pipeline is generated
+
+==================
+ 1) SonarQube and Trivy are both tools used in DevOps and CI/CD pipelines, but they serve different purposes:
+
+SonarQube: code analysis tool for code quality and security
+==> SonarQube is an open-source platform used to continuously inspect the quality of code in software projects. It perform static code analysis to identify bugs, vulnerabilities, and code smells(issues related to maintainability). SonarQube is widely used in the development lifecycle to ensure code quality and improve development processes by providing clear reports and metrics.
+Purpose: Code quality and security analysis:
+Used for:
+1) Detecting bugs, code smells, and vulnerabilities in source code.
+2) Enforcing coding standards and best practices
+3) Performing static code analysis (SAST)
+4) Generating detailed quality reports with metrics like code coverage, duplications etc.,
+
+Common languages supported: Java, Python, JavaScript, C#, and many more.
+
+Where it is used: During the code analysis phase in CI/CD before merging or deploying.
+
+
+
+
+Trivy:
+
+Purpose: Security Scanning tool
+Used for:
+1) Scanning Docker images, Kubernetes clusters, filesystems, and Git repositories for:
+ --> OS package vulnerabilities
+  --> Application dependencies vulnerabilities
+  --> Misconfigurations (IaC files like Terraform, Kubernetes manifests, etc.)
+  --> Secrets detection
+
+2) Fast and lightweight with CLI and CI/CD integration
+
+Where it is used: Before deployment or image publishing to scan for security risks.
+
+======================================
+
+
+1) create a ubuntu server with t2.medium
+2) open git bash and connect to the server
+3) sudo su -
+4) hostnamectl set-hostname dockerhost
+5) sudo su -
+6) To install docker in ubuntu
+ google search " docker installation on ubuntu" --> install docker engine on ubuntu
+Run the following command to uninstall all conflicting packages (old versions):
+--> for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
+
+Install using the apt repository
+Before you install Docker Engine for the first time on a new host machine, you need to set up the Docker apt repository. Afterward, you can install and update Docker from the repository.
+
+1) Set up Docker's apt repository.
+=============================
+
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+2)Install the Docker packages.
+================================
+
+Latest Specific version
+To install the latest version, run:
+-->  sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+press -y
+
+docker installed.
+
+3) systemctl status docker 
+
+4) docker pull Sonarqube
+5)docker images
+6)docker run -it --name sonar -p 9000:9000 sonarqube
+
+(access Sonarqube application on web with port : 9000)
+
+--> By default username & password: admin
+
+create a new password: 
+
+-> now we successfully access the SonarQube. we want to scan projects now.
+
+--> build code: mvn clean install
+ --> mvn sonar:sonar (to scan java project using maven integrated)
+    <SonarQube url>
+provide authentication using token.
+-> my account> security > Generate tokens > Name (sonartoken)> type (User Token)> Expires on (30 days)> Generate
+sonar token created: squ_3aded54c2752601450ea7422ff04f0f47f4c7100
+
+sonar token
+============
+
+7) mvn sonar:sonar \\
+      -Dsonar.host.url=http://54.147.225.123:9000 (SonarQube url) \\
+      -Dsonar.login=<provide sonartoken here>
+
+==================
+add this in ci/cd pipeline script
+
+stage('Sonarqube scan') {
+     steps {
+        echo 'scanning project'
+        sh -ls -ltrh'
+        sh '''mvn sonar:sonar \\
+      -Dsonar.host.url=http://54.147.225.123:9000 (SonarQube url) \\
+      -Dsonar.login=<provide sonartoken here>'''
+
+
+====================
+
+(this command scans our project)
+
+ctrl+p+q
+
+=========================
+8) to install Jenkins on ubuntu
+google search --> Jenkins installation ubuntu --> 
+---------------------------
+sudo apt update
+sudo apt install -y openjdk-17-jdk
+java -version
+
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
+/usr/share/keyrings/jenkins-keyring.asc > /dev/null
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+/etc/apt/sources.list.d/jenkins.list > /dev/null
+
+:~# ll
+
+apt update
+apt install jenkins -y
+
+systemctl status jenkins
+(service will start automatically in ubuntu)
+
+otherwise
+
+systemctl status jenkins
+systemctl enable jenkins
+
+Jenkins accessible through port: 8080
+
+=============================
+Note: Sonarqube is the container in dockerhost
+Jenkins is on the dockerhost
+---------------------------------
+
+create a job (cicd ) > pipeline project
+
+pipeline {
+    agent any
+	
+	tools {
+	 maven 'Maven_3.9.9'
+	}
+
+    stages {
+	
+        stage('CLONE GITHUB CODE') {
+            steps {
+                echo 'In this stage code will be clone'
+				git branch: 'main', url: 'https://github.com/devopstraininghub/mindcircuit15d.git'
+				
+				}
+        }
+		
+		
+		stage('sonarqube scan') {
+            steps {
+                echo 'scanning project'
+                sh 'ls -ltrh'
+                
+                sh ''' mvn sonar:sonar \\
+                      -Dsonar.host.url=http://ec2-18-234-233-210.compute-1.amazonaws.com:9000 \\
+                      -Dsonar.login=squ_fb5fdb469f3cbfe23a88554ae7cd3ba7e3c29263'''
+            }
+    	}
+		
+		
+        stage('BUILDING THE CODE') {
+            steps {
+                echo 'In this stage code will be build and mvn artifact will be generated'
+				sh 'mvn clean install '
+				
+            }
+        }		
+		
+		
+    }
+}
+==================
+
+TRIVY: Scans docker images
+ --> Trivy is a open -source vulnerability scanner designed to detect security issues in container images, file systems, and Git repositories.
+
+how to install trivy
+
+
+--> apt install rpm
+
+rpm -qa | grep Jenkins
+
+--> rpm -ivh https://github.com/aquasecurity/trivy/releases/download/v0.18.3/trivy_0.18.3_Linux-64bit.rpm
+trivy software installed
+
+--> trivy
+--> trivy --version
+--> docker images
+--> trivy image sonarqube:latest
+(trivy scans the docker image)
+
+
+
+
