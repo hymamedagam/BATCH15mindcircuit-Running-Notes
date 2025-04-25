@@ -363,7 +363,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Cloning GitHub repo'
-		git branch: 'main', url: 'https://github.com/devopstraininghub/mindcircuit15d.git'
+		git branch: 'main', url: 'https://github.com/hymamedagam/hyma_mindcircuit15d.git'
             }
   	}
 	
@@ -372,8 +372,8 @@ pipeline {
 	        echo 'Scanning project'
 		sh 'ls -ltr'
 		sh ''' mvn sonar:sonar \\
-		       -Dsonar.host.url=<sonarqube page url> \\
-		       -Dsonar.login=<sonarqube token>'''
+		       -Dsonar.host.url=http://18.206.190.228:9000 \\
+		       -Dsonar.login=squ_007735e76916f02c2d7a5ea288d6953508fa1eaa'''
 	    }
 	}
 
@@ -386,7 +386,7 @@ pipeline {
 	stage('Build Docker Image') {
 	    steps {
 		echo 'Build Docker Image'
-		sh 'docker build -t devopshubg333/batch15d:${BUILD_NUMBER} -f Dockerfile .'
+		sh 'docker build -t hymavathimedagam/docker1repo:${BUILD_NUMBER} -f Dockerfile .'
 	    }
 	}
 
@@ -394,18 +394,18 @@ pipeline {
 	    steps {
 		script {
 		    withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
-		        sh 'docker login -u devopshub333 -p ${dockerhub}'
+		        sh 'docker login -u hymavathimedagam -p ${dockerhub}'
 		    }
 		}
-		sh 'docker push devopshubg333/batch15d:${BUILD_NUMBER}'
+		sh 'docker push hymavathimedagam/docker1repo:${BUILD_NUMBER}'
 		echo 'Pushed successfully to Docker Hub'
 	    }
 	}
 	
 	stage('Update Deployment File') {
 	    environment {
-	        GIT_REPO_NAME= "mindcircuit15d"
-		GIT_USER_NAME= "devopstraininghub"
+	        GIT_REPO_NAME= "hyma_mindcircuit15d"
+		GIT_USER_NAME= "hymamedagam"
 	    }
             steps {
 	        echo 'Update Deployment File'
@@ -423,5 +423,4 @@ pipeline {
 	}
     }
 }
-
 
