@@ -1,0 +1,427 @@
+21st APR-2025
+============
+ARGO CD: GitOps tool
+===========
+Argo CD is a declarative, GitOps continuous delivery tool for Kubernetes.
+--> continuous delivery tool
+--> GitOps approach
+--> GitHub and Kubernetes integration.
+refer this website: GitHub.dev
+--> ARGO CD is also a controller which is managed by controller manager
+
+===========
+ARGO CD:
+
+1) declarative
+2) versioned and immutable
+3) pull automatically
+4) continuously reconciled
+
+=============
+Why Argo CD?
+Application definitions, configurations, and environments should be declarative and version controlled. Application deployment and lifecycle management should be automated, auditable, and easy to understand.
+===============
+
+Install ARGO CD on Kubernetes cluster
+
+1) open github and keep our manifest files in a repo
+2) set up cluster with 8 nodes
+eksctl create cluster --name b15dcluster --nodegroup-name b15ng --node-type t3.micro --nodes 8 --managed
+
+3) create a namespace for argocd
+
+ kubectl create namespace argocd
+
+4) kubectl get namespace
+
+5) Install argo cd using the provided YAML manifests
+ 
+kubectl apply -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml -n argocd
+
+6) check the status of argo pods to ensure they are running.
+ kubectl get all -n argocd
+ kubectl get svc -n argocd
+
+7) Expose the Argo CD server:
+Argo CD server needs to be accessible outside of the cluster. There are several ways to do this, such as using
+a Load Balancer or port forwarding.
+
+Using Load Balancer service:
+a) edit the Argo CD server service to type Load Balancer.
+
+kubectl edit svc argocd-server -n argocd
+( a pop-up will open, edit the type as LoadBalancer)
+
+or use this command:
+
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+
+8) Get the external ip of the Argo CD server:
+kubectl get svc argocd-server -n argocd
+
+copy the external ip of argocd-server (which is converted to LoadBalancer) and access through web.
+
+Argo CD opened:
+
+username: admin
+password:
+
+Note:
+kubectl get configmap -n argocd
+kubectl get secret -n argocd
+
+9) to get the initial Admin password:
+
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+
+kubectl create ns facebook
+kubectl get ns
+10) create an App
+
+[ Application name: b15-facebookapp
+  Project Name: default
+  SYNC POLICY: Automatic
+  
+Source
+Repo url: <GitHub repo url>
+path: <>
+
+destination:
+cluster:<cluster url>
+Namespace: facebook
+
+create
+
+again check by changing image name in manifest file
+
+10) kubectl get all -n facebook
+
+kubectl edit deploy fb-deploy -n facebook
+
+(some other persons edit the deployment in the cluster, it will go to out of sync)
+and argo cd will automatically synced.
+
+
+22-APR-2025: No class
+
+
+23-apr-2025: project
+===========
+end-to-end project
+===================
+OBJECTIVE: The primary objective of this project is to establish a robust CI/CD pipeline that automates
+the process of building, testing, and deploying applications by integrating Git, Jenkins, Maven, SonarQube, DockerHub, ArgoCD and Kubernetes(EKS),
+the project aims to achieve Continuous integration (CI) and Continuous Delivery (CD).
+
+
+Pre-requisites:
+=================
+1) Java application code hosted on a Git repository.
+
+2) Server requirements:
+
+--> A Linux server for Jenkins, Docker, SonarQube setup with an instance type "t2.large" and a EKS cluster to deploy container application.
+
+3) Software requirements:
+
+--> Jenkins, Docker, Maven, SonarQube, Kubernetes CLI(kubectl), eksctl for managing EKS clusters, EKS Kubernetes cluster, ArgoCD
+
+====================
+FLOW CHART:
+=============
+																 (KUBERNETES)
+GITHUB																Container App Deployment
+(Source Code)															& orchestration
+  |					     												  ^		
+  |																	  |
+(CICD Server) ----> Build ---> Static Code analysis --> Build & Push image to Docker Hub --> update CD manifest files repo for argocd <-- GitOps/ CD Tool
+Jenkins 	    MAVEN       SonarQube		docker					GitHub						argo
+
+
+==================
+
+1)create an instance and connect through MobaXterm.
+(Name->CI-CD-UTIL-SERVER, image-Amazonlinux, type-t2.large, storage-30GB)
+--> sudo hostname cicdserver
+--> sudo su -
+
+
+
+2) Jenkins Installation:
+First, install Jenkins on your Linux system:
+--------
+sudo yum update –y
+sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+sudo yum upgrade
+sudo dnf install java-17-amazon-corretto -y
+sudo yum install jenkins -y
+sudo systemctl enable jenkins
+sudo systemctl start jenkins
+-----------
+
+sudo systemctl status jenkins
+
+--> publicip:8080 (access Jenkins in browser and install plugins (Pipeline: stage view, Blue Ocean, Docker)
+
+
+
+3) Docker Installation and Configuration:
+Install Docker and configure it to work with Jenkins:
+------------------
+sudo yum install docker -y
+sudo systemctl start docker
+sudo usermod -aG docker jenkins
+sudo usermod -aG docker ec2-user
+sudo systemctl restart docker
+sudo chmod 666 /var/run/docker.sock
+-----------------
+
+--> docker -v
+--> cat /etc/groups
+
+
+4) Kubectl and Eksctl Installation:
+Install kubectl and eksctl to manage Kubernetes clusters:
+----------------
+
+kubectl installation on Linux:
+
+reference url: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+-------------
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"   
+echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+---------------
+--> kubectl version --client
+
+
+eksctl installation Linux:
+
+reference url: https://sarvar04.medium.com/configure-eksctl-kubectl-aws-cli-on-amazon-linux-2-6efc3e166dbc
+---------------
+
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+
+sudo mv /tmp/eksctl /usr/local/bin
+
+-----------------
+
+--> eksctl version
+
+
+5) AWS CLI configuration: Configure AWS ClI to interact with AWS services.
+=============
+To give our own AWS cloud account access to the server terminal, we need to install aws cli and authenticate credentials.
+We are using amazonlinux, so aws cli is already installed.
+
+aws --version
+
+to authenticate
+--> aws configure
+
+It will asks access key and secret access key
+(aws account> security credentials>access keys>create access key)
+access key ID:
+secret access key ID:
+Region: us-east-1
+Default output format: json
+
+--> aws sts get-caller-identity
+(it shows that the respective terminal has root access to the given aws account)
+
+======================
+
+6) Create EKS cluster using eksctl:
+
+eksctl create cluster --name mcappcluster --nodegroup-name mcng --node-type t3.micro --nodes 8 --managed
+
+
+7) open jenkins and set credentials because credentials are needed while pushing images to docker hub)
+ manage jenkins> credentials> system>global
+new credentials
+kind: secret text
+secret: <type dockerhub account password>
+ID: dockerhub
+Description: dockerhub
+
+to update the latest image tags in GitHub manifest files, for this also credentials needed.
+
+Note: keep a docker file in GitHub and also deployment files.
+
+8) create a jenkins job (cicd) with pipeline
+
+9)install git in terminal:
+ yum install git -y
+
+10) install maven automatically
+manage jenkins> tools> (give name: maven3)
+
+11) SonarQube configuration:
+
+docker run -it --name sonarcont -p 9000:9000 sonarqube
+
+(access sonarqube in browser with publicip of server:9000)
+
+username and password: admin
+later reset new password
+
+create a token:
+
+my account> security>Generate Token>
+(Name: sonartoken, Type: User Token and generate)
+
+
+12) Build docker image from Dockerfile
+
+13) push docker image to docker hub using docker hub username and password.
+we can get script through pipeline script as well.
+(with credentials: Bind credentials to variables
+add: secret text
+variable: dockerhub
+credentials: dockerhub
+(dockerhub credential Id is bind to dockerhub variable id)
+ 
+username: devopshub333
+
+here, we are pushing the image with Jenkins build tag.
+
+14) how to get the pushed tag automatically in manifest file(deployment files)image in github.
+
+using sed command: replace docker image tag to image tag placed in deployment.yaml .
+to push to GitHub, we need to generate token or use password.
+
+GitHub token generate:
+settings> developer settings> personal access tokens/tokens(classic)> generate new token (classic)
+token generated.
+
+store GitHub token as secret in credentials manager.
+
+manage jenkins> credentials> global> add credentials
+
+kind: secret text
+secret: generated GitHub token 
+id: githubtoken
+variable: githubtoken
+
+
+15) deploy the image in eks cluster using argocd
+
+eksctl get cluster
+kubectl create namespace argocd
+kubectl apply -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml -n argocd   (install agrocd)
+kubectl get svc -n argocd
+kubectl edit svc argocd.server -n argocd
+(change type: ClusterIp to type: LoadBalancer)
+
+Access argocd using loadbalancer url of the argocd server
+ to get the initial Admin password:
+
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+(password stored in secret. give password and signin)
+
+create an app
+mc-fb-app
+
+Project name: default
+sync policy: automatic
+
+Source:
+<GitHub repo url>
+
+Path:
+deployment files
+
+destination:
+< default cluster>
+
+namespace : prod
+
+kubectl create namespace prod
+
+create
+
+kubectl get all -n prod
+
+access external ip in browser
+
+kubectl describe deploy fb-deploy -n prod
+
+==> eksctl get cluster
+eksctl delete cluster mcapp cluster
+==> delete cicd server
+==============================
+pipeline {
+    agent any
+
+    tools {
+        maven 'maven3'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Cloning GitHub repo'
+		git branch: 'main', url: 'https://github.com/devopstraininghub/mindcircuit15d.git'
+            }
+  	}
+	
+	stage('SonarQube Scan') {
+	    steps {
+	        echo 'Scanning project'
+		sh 'ls -ltr'
+		sh ''' mvn sonar:sonar \\
+		       -Dsonar.host.url=<sonarqube page url> \\
+		       -Dsonar.login=<sonarqube token>'''
+	    }
+	}
+
+	stage('Build Artifact') {
+	    steps {
+	        sh 'mvn clean package'
+	    }
+	}
+
+	stage('Build Docker Image') {
+	    steps {
+		echo 'Build Docker Image'
+		sh 'docker build -t devopshubg333/batch15d:${BUILD_NUMBER} -f Dockerfile .'
+	    }
+	}
+
+	stage('Push to Docker Hub') {
+	    steps {
+		script {
+		    withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
+		        sh 'docker login -u devopshub333 -p ${dockerhub}'
+		    }
+		}
+		sh 'docker push devopshubg333/batch15d:${BUILD_NUMBER}'
+		echo 'Pushed successfully to Docker Hub'
+	    }
+	}
+	
+	stage('Update Deployment File') {
+	    environment {
+	        GIT_REPO_NAME= "mindcircuit15d"
+		GIT_USER_NAME= "devopstraininghub"
+	    }
+            steps {
+	        echo 'Update Deployment File'
+		withCredentials([string(credentialsId: 'githubtoken', variable: 'githubtoken')]) {
+		    sh '''
+		    git config user.email "hyma@gmail.com"
+		    git config user.name "Hyma"
+		    sed -i "s/batch15d:.*/batch15d:${BUILD_NUMBER}/g" deploymentfiles/deployment.yaml
+		    git add .
+		    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+		    git push https://${githubtoken}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+ 		    '''
+		}
+	    }
+	}
+    }
+}
+
+
