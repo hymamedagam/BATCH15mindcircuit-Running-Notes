@@ -917,5 +917,106 @@ spec:
   containers:
   - name: nginx
     image: nginx
+=============================
 
+argocd:
+
+kubectl create namespace argocd
+
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+
+
+Get the Initial Admin Password:
+
+
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+
+==============================================================
+
+DATE: 25 APR 25
+
+INGRESS - Advanced load balancing capabilities 
+
+Purchasing domain in Godaddly 
+Hosting it on route-53 & creating records 
+Ingress Hostbased and  path based routing 
+
+===================================
+===================================
+
+DATE: 26 APR 25
+
+
+eksctl create cluster --name b15dcluster  --nodegroup-name b15dng --managed
+
+
+----------------------------------------
+
+cluster.yaml 
+
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: b15dcluster
+  region: us-west-2 
+  version: "1.29"  
+
+managedNodeGroups:
+  - name: b15d
+    instanceTypes: ["m5.large"]  
+    desiredCapacity: 2           # Default number of nodes
+    minSize: 1
+    maxSize: 3
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+        ebs: true
+
+
+==============
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: b15dcluster
+
+managedNodeGroups:
+  - name: b15d
+    spot: true
+    instanceTypes: ["m5.large"]  # Use multiple types for better availability
+    desiredCapacity: 2
+    minSize: 1
+    maxSize: 3
+    labels:
+      lifecycle: Ec2Spot
+    tags:
+      "k8s.io/cluster-autoscaler/enabled": "true"
+      "k8s.io/cluster-autoscaler/b15dcluster": "owned"
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+        ebs: true
+================
+
+KUBERNETS VOLUMES 
+
+VOLUMES , 
+Persistant Volume (PV) 
+Persistant Volume  Claim 
+
+
+STATIC PROVISIONING 
+DYNAMIC PROV 
+
+------------------------
+
+create a volume in AWS ( EBS Storage Block Volume) 
+drivers install:
+ kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.42"
+
+permissions setup  -- using IAM role modification 
 
