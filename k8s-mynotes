@@ -1,0 +1,2151 @@
+09-Apr-2025
+===============
+
+CHALLENGES WITH DOCKER:
+========================
+- Single Docker host 
+- downtime 
+- NO High availability, not Production grade / Enterprise level 
+- No self Healing / Auto healing 
+- No proper Auto scaling / Limited auto-scaling and self-healing capabilities
+- Managing multiple containers at scale is tough
+- No built-in orchestration for container deployment
+- Networking between containers can get complex
+- Load balancing across containers isn’t automatic
+- Monitoring and logging need extra tools
+
+- DOCKER CAN NOT ORCHESTRATE
+
+==============================================
+
+
+CONT.ORC CONCEPTS ---> DOCKER SWARM / K8S 
+
+WHY KUBERNETES (K8S):
+=========================
+- Automates container orchestration & Automated Scheduling (hpa) 
+- Scales containers up or down easily
+- Handles networking across clusters
+- Self-healing: restarts failed containers
+- Built-in load balancing
+- Simplifies deployment and updates
+- Automated rollouts & rollback: 
+
+
+========================================================================
+What is Kubernetes?
+•	Kubernetes is an orchestration engine and open-source platform for managing containerized applications.
+•	Responsibilities include container deployment, scaling & descaling of containers & container load balancing.
+•	Actually, Kubernetes is not a replacement for Docker, But Kubernetes can be considered as a replacement for Docker Swarm, Kubernetes is significantly more complex than Swarm, and requires more work to deploy.
+•	Born in Google ,written in Go/Golang. Donated to CNCF(Cloud native computing foundation) in 2014.
+•	Kubernetes v1.0 was released on July 21, 2015.
+
+
+FEATURES:
+
+•	Automated Scheduling: 
+Kubernetes provides advanced scheduler to launch container on cluster nodes based on their resource
+requirements and other constraints, while not sacrificing availability.
+
+•	Self Healing Capabilities:
+ Kubernetes allows to replaces and reschedules containers when nodes die. It also kills containers that don’t
+respond to user-defined health check and doesn’t advertise them to clients until they are ready to serve.
+
+•	Automated rollouts & rollback: 
+Kubernetes rolls out changes to the application or its configuration while monitoring application health
+to ensure it doesn’t kill all your instances at the same time. If something goes wrong, with Kubernetes you can rollback the change.
+
+•	Horizontal Scaling & Load Balancing:
+ Kubernetes can scale up and scale down the application as per the requirements with a simple
+command, using a UI, or automatically based on CPU usage.
+
+
+
+SOFTWARES:  eksctl , kubectl , aws cli , visualstudo code(IDE)
+
+
+eksctl install on windows:
+------------
+refer link: https://eksctl.io/installation/
+
+google search - eksctl installation on windows through chocolatey (package manager for windows)
+install chocolatey
+(click on Try it now>individual, and open a windows powershell> right click and select 'run as administrator'
+enter this command 'Get-ExecutionPolicy'.
+If it returns Restricted, then run Set-ExecutionPolicy AllSigned,  type Y
+--> Now run the following command
+> Set-ExecutionPolicy Bypass-Scope Process;[System.Net.ServicePointManager]::SecurityProtocol = [Aystem.Net.ServicePointManager]::Sec
+
+chocolatey package manager is installed
+how to check if it is installed or not.
+--> choco
+it is installed
+--> choco install eksctl -y,
+we can upgrade it also.
+choco upgrade eksctl -y
+--> eksctl version
+
+
+(chocolatey --> package manager for windows
+ yum --> package manager for Linux
+apt--> package manager for ubuntu)
+
+
+2) kubectl install on windows:
+===============================
+refer link: https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html (click on windows option)
+
+curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.32.0/2024-12-20/bin/windows/amd64/kubectl.exe
+or 
+
+choco install kubernetes-cli
+
+(type A)
+--> kubectl version --client
+
+
+3) aws cli install on windows:
+===============================
+refer link:
+https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+
+1) download AWS CLI MSI installer on windows
+2) aws --version
+
+
+1. chocolatey 
+------------------------
+2. eksctl -- CLUSTER CREATION 
+$ eksctl version
+0.207.0
+---------------------
+
+3. kubectl -- CLI TO INTERACT WITH CLUSTER ( API SERVER) 
+kubectl version --client
+Client Version: v1.32.0-eks-5ca49cb
+Kustomize Version: v5.5.0
+------------------------------
+
+4. AWS CLI 
+ aws --version
+aws-cli/2.23.9 Python/3.12.6 Windows/11 exe/AMD64
+
+5. visual studio code  (IDE ) 
+
+============================
+refer link: https://code.visualstudio.com/download
+
+Installing on linux machine :: 
+
+kubectl & eksctl installation on aws linux machine 
+
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+
+
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+
+============================================================
+
+=================================================================================
+10-APRIL-2025
+===============
+KUBERNETES ARCHITECTURE-CLUSTER SETUP
+==========
+
+WHY K8S 
+
+High availability , Zero downtime , 
+
+K8S ARCHITECTURE:
+================
+
+Kubernetes Architecture is based on a master-worker model, where the Master manages and controls the cluster, and the Workers run the containerized applications. Let's break down the architecture and its core components.
+
+KUBERNETES ARCHITECTURE :
+
+Master Node:    The control plane responsible for managing the Kubernetes cluster.
+Worker Nodes:   The nodes that run the containerized applications (pods).
+Cluster:        A set of worker nodes managed by the master node.
+
+
+---------------------------------------
+
+1. MASTER NODE (CONTROL PLANE): 
+============================
+The Master Node is the brain of the Kubernetes cluster. It manages the cluster, maintains the desired state, schedules workloads, and monitors the overall health of the cluster. It consists of several critical components:
+
+     KUBE-APISERVER:  (gateway to the cluster)   
+     The API server is the central point of contact for all Kubernetes components. It handles requests from clients, whether that’s the kubectl CLI, the Kubernetes UI, or other components in the system.     
+     The API server exposes the REST API, which is used by external clients to interact with Kubernetes. It ensures the system’s state is updated.
+     
+	 
+     ETCD:     
+     etcd is the key-value store used to store the configuration and state of the cluster. It is highly available and persistent, ensuring that Kubernetes can recover the cluster's state even after a failure. All cluster data, including the desired state, nodes, and secrets, are stored here.     
+     etcd ensures consistency across the entire cluster.
+     
+	 
+     KUBE-SCHEDULER:     
+     The scheduler watches for newly created pods that have no assigned node and assigns them to a node based on resource availability, constraints, and policies.     
+     It ensures that workloads are distributed across nodes in an efficient and optimal manner.
+     
+     
+	 KUBE-CONTROLLER-MANAGER:     
+     The controller manager is responsible for ensuring that the cluster's desired state is maintained. It runs various controllers (e.g., replication controllers, deployment controllers) that monitor the state of the system and take action if the current state does not match the desired state.
+     
+     Example controllers include replica set controllers, deployment controllers, and node controllers.
+     
+     CLOUD-CONTROLLER-MANAGER (OPTIONAL):     
+     This component is used when running Kubernetes in a cloud environment. It interacts with the underlying cloud provider (e.g., AWS, Google Cloud) to manage resources like load balancers, volumes, and instances.
+     
+     It helps in maintaining cloud-specific services in coordination with Kubernetes.
+     
+	 
+2. WORKER NODE COMPONENTS:
+===========================
+
+     A Worker Node (also called a Minion) runs the applications and workloads in the form of Pods. Each worker node contains the following components:
+     
+     KUBELET:     
+     The kubelet is an agent running on each worker node that ensures the containers within the pods are running and healthy.
+     
+     It communicates with the API server to report the status of the node and its pods.
+     
+     The kubelet ensures that containers are running as specified in the pod's configuration and takes action to rectify any issues (e.g., restarting a failed container).
+     
+	 
+     KUBE-PROXY:     
+     The kube-proxy manages networking for the Kubernetes cluster, providing networking services such as load balancing, service discovery, and routing traffic to the right pod.     
+     It helps route requests to the correct pod and maintains network rules to manage incoming and outgoing traffic.
+     
+     CONTAINER RUNTIME (DOCKER)      
+     The container runtime is responsible for running the containers inside a pod. Kubernetes supports various runtimes, but Docker was the default (although Kubernetes is moving toward containerd and other runtimes).
+     
+     It pulls container images, starts containers, and manages the lifecycle of containers within the pods.
+	 
+     
+     PODS:     
+     Pods are the smallest deployable units in Kubernetes and can contain one or more containers.     
+     A pod represents a single application instance, and all containers within the pod share the same network namespace, storage volumes, and lifecycle.     
+     Pods can be scaled up or down by the Kubernetes scheduler, and they are ephemeral (they may be replaced or rescheduled on different nodes).
+
+Using kubectl command: we can interact with the cluster.
+==================================================================
+
+Note: creating & managing cluster is easy in dockerswarm compared to k8s.
+In k8s, cluste setup is complex to create and manage.
+Hence, cloud providers introduced cluster as a service.
+AWS--> EKS (Elastic Kubernetes service)
+Azure--> AKS (Azure Kubernetes service)
+GCP --> GKE (Google Kubernetes Engine)
+
+Cloud providers will setup the cluster, we can access the applications using cloud EKS services (AWS)
+
+
+
+If we setup the cluster --> self-hosted/self-managed/bare-metal Kubernetes cluster
+If cloud manages the cluster --> fully managed/AWS managed Kubernetes cluster
+
+
+Traditional approach - Self managed, baremetal, customer managed k8s cluster
+===================
+--> Kubernetes control plane- self managed
+   Need to make control plane highly available
+   maintain multiple EC2 in multiple AZ(Availability Zones)
+   scale control plane if needed
+   keep etcd up and running
+  overhead of managing EC2s
+  security patching
+  replace failed EC2s/VMs/physical servers
+  orchestration for Kubernetes version upgrade
+============================
+
+Cloud Managed Kubernetes (EKS/AKS/GKE):
+
+Kubernetes control plane: AWS managed - EKS
+
+AWS manages Kubernetes control plane
+Amazon Elastic Kubernetes service:
+AWS maintains high availability - Multiple EC2 in Multiple AZs
+AWS detects and replaces unhealthy control plane instances
+AWS scales control plane
+AWS maintains etcd
+Provides automated version upgrade and patching.
+
+=============================
+
+EKS K8S CLUSTER SETUP:
+=======================
+
+--> through access key and secret access key, we can give admin access to aws cli to interact with the AWS cloud.
+
+
+Open Git bash
+============
+eksctl version
+kubectl version
+aws --version
+
+ generate keys (aws console (my account)> security credentials > Access keys
+Note: if you want to delete previous access keys --> Actions> deactivate> delete
+
+Access key: 
+Secret access key: 
+
+1) aws configure
+(it asks access and secret access keys)
+region name: us-east-1
+
+Note: what is eksctl?
+--> it is a CloudFormation stack
+--> cli tool for creating clusters on EKS
+--> easier than console
+--> abstracts a lot of stuff- VPC, Subnet, Security groups, nodes, docker etc.,
+using CloudFormation stack
+
+======================
+(eksctl create cluster
+
+control plane: AWS will take care ! ($0.10 per hour=8 rupees we can not avoid)
+Data plane: 2 m5.large)
+======================
+
+eksctl create cluster --name <name> --version <> --nodegroup-name <> --node-type t3.micro --nodes 4 --managed
+
+nodegroup: A node group is a collection of worker nodes (EC2 instances) within a Kubernetes cluster that share the same configuration-
+such as instance type, AMI, and scaling settings.
+--managed --> it means aws will manage if any issue with the pods and all
+
+2) eksctl create cluster --name b15dcluster --nodegroup-name b15ng --node-type t3.micro --nodes 4 --managed
+ --> When u run this command eksctl will trigger 2 CloudFormation stacks. one for cluster creation and another one for nodegroup creation
+ --> EC2, we can see worker nodes
+--> VPC , we can see vpc, subnet, 
+--> Auto scaling group
+--> check cloud formation, we can see stacks
+--> eks, we can see cluster
+
+AWS CloudFormation is primarily used for modeling, provisioning, and managing AWS resources through an "infrastructure as code" approach.
+In AWS CloudFormation, a stack represents a collection of AWS resources that are managed as a single unit
+
+3) eksctl get cluster
+4)to interact with cluster
+kubectl get nodes
+5) kubectl run pod1 --image tomcat
+(pod1 created)
+6) kubectl get pods
+7) kubectl run pod2 --image amazonlinux
+8) kubectl get pods
+(if we not engage bin/bash in amazonlinux, then the container will stop)
+CrashLoopBackoff error: 
+
+9) kubectl describe pod pod2
+
+10) eksctl get cluster
+11) eksctl delete cluster b15dcluster
+
+============================
+
+11-APRIL-2025: PODS and Replica Sets
+============
+EKS Concepts:
+
+create a new folder and open git bash
+create a cluster
+eksctl create cluster --name b15dcluster --nodegroup-name b15ng --node-type t3.micro --nodes 4 --managed
+
+eksctl get cluster
+kubectl get nodes
+kubectl get nodes -o wide
+
+kubectl run fbpod --image tomcat
+kubectl get po
+kubectl run pod2 --image amazonlinux
+kubectl get po (we will get STATUS: CrashLoopBackOff)
+
+
+kubectl describe po pod2
+kubectl describe po fbpod
+
+kubectl run pod3 --image tomcatttt
+kubectl get po (we will get STATUS: ErrImagePull)
+
+kubectl describe po pod3
+ 
+(see events there)
+
+kubectl logs fbpod
+kubectl logs pod2
+kubectl logs pod3
+
+YAML: Data representation format. One of the data structure format to represent data.
+In our case, it is a k8s object configuration data. It follows key-value pair
+eg: name: fbserver
+
+
+Eg: server details
+
+name = fbserver
+owner = Hyma
+created = 11-4-2025
+status = active
+
+
+show above server details in xml, yaml, and json formats
+============
+
+XML
+=======
+
+<server>
+    <name>fbserver</name>
+    <owner>Hyma</owner>
+    <created>2025-04-11</created>
+    <status>active</status>
+</server>
+
+
+YAML
+=======
+
+server:
+    name: fbserver
+    owner: Hyma
+    created: 2025-04-11
+    status: active
+
+
+JSON:
+======
+
+{
+  "server": {
+    "name": "fbserver",
+    "owner": "Hyma",
+    "created": "2025-04-11",
+    "status": "active"
+  }
+}
+
+=================================================
+
+two servers in YAML format:
+
+servers:
+    - name: fbserver
+      owner: Hyma
+      created: 2025-04-11
+      status: active
+
+    - name: instaserver
+      owner: Harshi
+      created: 2025-04-11
+      status: active
+===============
+Array/List:
+
+Fruits:
+- grape
+- banana
+- Orange:
+    Carbs: 5g
+    Calories: 50
+    Fat: 0.1g
+
+- apple:
+    Fat: 0.1g
+    Carbs: 5g
+    Calories: 50
+
+=======================
+Dictionary: set of properties, grouped together
+
+Orange:
+    Calories: 50
+    Fat: 0.1g
+    Carbs: 5g
+
+make sure we are giving spaces properly
+- equal number of spaces
+=========================
+
+eg: kubectl run fbpod --image tomcat
+
+write in pod.yaml format
+
+pod1.yaml
+============
+---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: fbpod
+    labels: facebook
+    env: lab
+spec: 
+    containers:
+        - name: fbcont1
+          image: tomcat
+==================
+Open VisualStudio code and install yaml
+
+write below code in yaml -->schemas --> settings.json
+-----------------
+{
+    "redhat.telemetry.enabled": true,
+    "yaml.schemas": {
+
+        "kubernetes": "*.yaml"
+    },
+    "workbench.editor.enablePreview": false
+}
+
+------------------
+Note: Telling yaml that am writing this yaml for Kubernetes objects.
+-------------------
+
+==> kubectl get po
+kubectl delete po fbpod pod2 pod3
+
+----------------
+
+1)write pod1.yaml file in Visual Studio code (created pod using manifest file)
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: fbpod
+    labels: 
+        app: facebook
+        env: lab
+spec: 
+    containers:
+        - name: fbcont1
+          image: devopshubg333/batch15d:mcfbapp
+
+--> In bash, 
+ll (we can see po1.yaml file)
+
+kubectl apply -f pod1.yaml 
+kubectl get po
+kubectl logs fbpod
+kubectl describe po fbpod
+kubectl get po
+(pod is running with single container)
+
+-------------------------
+2) pod with multiple containers
+
+pod2-mc.yaml
+==============
+---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: fbpod-mc
+    labels: 
+        app: facebook
+        env: lab
+spec: 
+    containers:
+        - name: fbcont1
+          image: devopshubg333/batch15d:mcfbapp
+
+	- name: fbcont2
+          image: tomcat
+----------------
+
+ll
+cat pod2-mc.yaml
+kubectl apply -f pod2-mc.yaml
+kubectl get pods
+kubectl describe po fbpod-mc
+
+Note: If a pod has multiple containers, those containers will share the pod Ip only.
+Pod has a single IP even it contains multiple containers.
+
+kubectl get po
+
+kubectl delete po fbpod
+kubectl get po
+
+===============================
+3) Note: if one pod deleted knowingly or unknowingly, then another pod will create automatically.
+
+replica set: abstraction of pods. where pod is a abstraction of container.
+replica set>pods>containers
+--> it will maintain desired number of pods up and running.
+controller manager will manage the replica set.
+
+replicaset.yaml
+=================
+
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+     name: fb-rs
+     labels:
+         app: facebook-insta
+         env: lab
+spec:
+    selector:
+        matchLabels:
+            app: facebook 
+
+    replicas: 3
+    template:
+        metadata:
+            name: fbpod
+            labels: 
+                app: facebook
+                env: lab
+        spec: 
+            containers:
+               - name: fbcont1
+                 image: devopshubg333/batch15d:mcfbapp
+==========
+ll
+cat replicaset.yaml
+kubectl apply -f replicaset.yaml
+(replicaset created)
+
+kubectl get replicaset
+or
+kubectl get rs
+
+kubectl get po
+kubectl describe rs fb-rs
+kubectl delete po fb-rs-czk85
+kubectl get po
+
+(new pod got created automatically)
+
+kubectl get po -o wide
+kubectl get po -o wide --show-labels
+ll
+
+
+kubectl apply -f pod1.yaml
+(fbpod created and deleted)
+
+kubectl get po
+
+(replica set only maintain the desired number of pods which we gave already 3 pods)
+Already 3 pods are running. hence, it created and deleted another pod
+
+
+kubectl get rs
+kubectl describe rs fb-rs
+
+Note: Replicasets controlled by replica controller-manager (replica controller-manager managed by controller-manager in master node or control plane)
+
+kubectl delete rs fb-rs
+
+kubectl apply -f pod1.yaml
+kubectl get po
+
+kubectl apply -f replicaset.yaml
+
+kubectl get po
+
+kubectl get rs --show-labels
+
+eksctl get cluster
+eksctl delete cluster b15dcluster
+    
+==========================
+
+14-Apr-2025: Deployments
+======================
+1) create a folder in visualstudio code (Deployment.yaml-practice)
+2) open git bash and set up cluster
+eksctl create cluster --name b15dcluster --nodegroup-name b15ng --node-type t3.micro --nodes 4 --managed
+
+eksctl get cluster
+kubectl get nodes
+kubectl get nodes -o wide
+
+===============
+To delete,
+
+kubectl delete all --all  ---> to delete everything
+kubectl delete pod --all --> to delete all pods
+kubectl delete rs --all --> delete all resplicasets
+
+to get,
+
+kubectl get all --> to access everything
+
+3) create a pod
+  a) In CLI, 
+kubectl run pod1 --image tomcat
+kubectl get po
+
+ b) using manifest file:
+=================
+pod1.yaml
+
+c) using dry run:
+kubectl run pod2 --image nginx --dry-run -o yaml
+
+(we can get pod2 skeleton)
+
+put this as pod3.yaml in VS Code
+
+pod3.yaml
+==========
+---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: pod2
+    labels:
+        run: pod2
+spec:
+    containers:
+        - image: nginx
+          name: pod2
+
+
+
+4) kubectl cluster-info
+(get information about the cluster)
+
+5) kubectl cluster-info dump
+(end to end information about the cluster)
+
+6) kubectl explain pods
+7) kubectl explain pods.spec
+8) kubectl explain pods.metadata
+9) kubectl api-resources
+10) kubectl api-resources | grep pods
+11) kubectl api-resources | grep replicaset
+12) kubectl get po -o wide
+13) kubectl get nodes
+14) kubectl cordon <instance ip> --> unscheduled the nodes, no new pod will be schedule
+Marks a node as unschedulable-new pods will not be scheduled on it, but existing pods continue to run.
+when you want to stop placing new workloads on the node but don't want to disrupt what's already running.
+
+eg: kubectl cordon ip-192-168-2-196.ec2.internal --> no more pods will schedule on this node
+
+15)kubectl get nodes
+16) kubectl uncordon ip-192-168-2-196.ec2.internal --> the node will come to ready state from disabling state, and allows pods
+17) kubectl get nodes
+
+18) kubectl drain <instance-ip> --> if replicaset is handling the pods then it evicts all pods on the node to another node, and scheduling will disable
+19)  kubectl drain <instance-ip> --force
+20) kubectl get po -o wide
+21) kubectl get nodes
+kubectl get po
+
+Note: cordon --> disables scheduling on node, and the existing pods will remains exists and doesn't allow new pods
+      drain --> disables scheduling on node, exists pods will delete and doesn't allow new pods. (cordon+delete= drain)
+if replicaset is controlling the pods then the replicaset will evict the pods from this node to another node
+
+22) ll
+23) kubectl apply -f replicaset.yaml
+24) kubectl get rs
+25) kubectl get nodes
+26) ubectl get po
+
+Labels can be used as filter to replica set , so replica set will monitor and ensure desired no of pods are running 
+
+==========================================================
+scale replicas and ways to scale :
+
+1. kubectl scale rs fb-rs --replicas 3
+2. Change manifest file -->- then kubectl apply -f replicaset.yaml
+3. kubectl scale --replicas=3 -f replicaset.yaml
+4. kubectl edit replicaset <replicasetname> --> opens a temporary file in memory, there we can change replicas
+
+===============================
+27) kubectl scale rs fb-rs --replicas 2
+kubectl get all
+
+28) kubectl scale rs fb-rs --replicas 3
+kubectl get all
+
+
+ReplicaSet: maintains desired number of pods are running
+
+29) change image in replicaset.yaml file and apply
+kubectl apply -f replicaset.yaml
+kubectl get all
+
+(image can not be updated in pod)
+
+Deployment object:
+===================
+--> abstraction of replica sets
+deployment>replicaset>pod>containers
+
+rolling update:
+=================
+A rolling update allows a Deployment update to take place with zero downtime. It does this by incrementally replacing the current Pods with new ones. The new Pods are scheduled on Nodes with available resources, and Kubernetes waits for those new Pods to start before removing the old Pods.
+
+Deployment:
+-----------
+automatic updates, rollbacks
+
+1) create folder (Deployments-Practice) and create a new file in it (deployment-AC-V1.yaml)
+
+kubectl api-resources | grep deploy
+
+2) write below code in deployment_AC_V1.yaml file
+=============
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: fb-deploy
+   labels:
+      app: facebook
+      env: lab
+spec:
+   selector:
+       matchLabels:
+           app: facebook
+    
+   replicas: 3
+   template:
+       metadata:
+           name: fbpod
+           labels:
+              app: facebook
+              Version: AC_V1
+       spec:
+          containers:
+              - name: fbcont1
+                image: devopshubg333/batch15d:mcfbapp
+		ports:
+		   - containerPort: 8080
+
+
+3) kubectl get all
+4) kubectl delete rs fb-rs
+5)ll
+6) kubectl apply -f deployment-AC-V1.yaml
+7) kubectl get all
+8)kubectl describe deploy fb-deploy
+
+9) create another file deployment_VC_V2.yaml 
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: fb-deploy
+   labels:
+      app: facebook
+      env: lab
+spec:
+   selector:
+       matchLabels:
+           app: facebook
+    
+   replicas: 3
+   template:
+       metadata:
+           name: fbpod
+           labels:
+              app: facebook
+              Version: VC_V2
+       spec:
+          containers:
+              - name: fbcont1
+                image: devopshubg333/batch15d:python_flaskapp
+		ports:
+		   - containerPort: 8080
+
+
+10) kubectl apply -f deployment_VC_V2.yaml
+(another replicaset will be created with new pods for the Version: V2 VC(video call feature) and later old pods will be deleted)
+
+11) kubectl get all
+12) kubectl describe deploy fb-deploy
+
+In Kubernetes, the maxSurge and maxUnavailable properties are used to control the rolling updates of a deployment.
+maxSurge
+The maxSurge property controls the maximum number of additional pods that can be created during a rolling update. It specifies the number or percentage of pods above the desired replica count that can be temporarily created. During an update, Kubernetes creates new pods to replace the old ones, and the maxSurge property ensures that the total number of pods does not exceed a certain limit.
+
+maxUnavailable
+The maxUnavailable property determines the maximum number or percentage of pods that can be unavailable during a rolling update. It specifies the maximum number of pods that can be simultaneously removed from service during the update progresses. By default, Kubernetes terminates one pod at a time while creating new pods, ensuring that the desired replica count is maintained.
+
+
+13) eg: for rollout update in deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+spec:
+  selector:
+     matchLbels:
+         app: facebook
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: facebook
+    spec:
+      containers:
+        - name: my-container
+          image: my-image:latest
+          ports:
+            - containerPort: 8080
+
+
+
+14) kubectl get deploy
+15) kubectl get po --watch
+16) In another terminal,
+ kubectl rollout undo deploy <deployment_name>
+
+kubectl rollout undo deploy fb-deploy
+
+In git bash,
+kubectl get po --watch
+kubectl get all
+
+17) in terminal,
+c
+18) kubectl rollout history deploy fb-deploy
+19) kubectl rollout resume deploy fb-deploy
+20) kubectl rollout undo deploy fb-deploy
+21) kubectl describe deploy fb-deploy
+
+eksctl get cluster
+eksctl delete cluster <cluster_name>
+
+
+Note: kubectl create deployment instadeploy --image=devopshubg333/batch15d:mcappimag --replicas=3 --dry-run -o yaml
+=======================
+
+15-APR-2025: SERVICES AND NAMESPACES
+================================
+
+1) open git bash and set up cluster with 5 nodes
+eksctl create cluster --name b15dcluster --nodegroup-name b15ng --node-type t3.micro --nodes 5 --managed
+
+eksctl get cluster
+kubectl get nodes
+
+2) kubectl apply -f deployment_practice/01_deploy_AC-V1.yaml
+kubectl get all
+
+3) kubectl get po -o wide
+4) kubectl exec -it <pod_name> -- bash
+ll (we can get root.war file)
+5) curl localhost:8080  (check internally)
+Note: we can not access the application in the pod through pod ip or container ip's
+
+Because, pod ip's are ephemeral in nature. if one pod is deleted, another pod is created automatically with new IP.
+6) kubectl get po -o wide --show-labels (pod ip, pod name, pod residing in the node might change, but pod labels can not change)
+
+how to access the pod externally.
+================================
+
+we should create services to access the pods. service sends requests to the pods which contains
+ selector as app: facebook or what we gave in manifest file.
+
+Three types of service objects:
+
+1) cluster IP
+2) node port
+3) Load balancer
+
+for pod communication, we should create service objects.
+
+kubectl api-resources | grep service
+
+1) create a folder (03-SERVICES-PRACTICE) and create a new file (loadbalancer-svc.yaml)in visual studio code.
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: fb-lb-svc
+    labels:
+        app: facebook
+spec:
+    type: LoadBalancer
+    ports:
+        - port: 80
+          targetPort: 8080
+    selector:
+        app: facebook
+       
+====================
+ll
+kubectl apply -f 03-SERVICE-PRACTICE/loadbalancer-svc.yaml
+
+kubectl get svc
+
+(Load balancer is created in AWS also)
+we can access the application from Kubernetes LoadBalancer service.
+
+
+2) kubectl apply -f deployment_practice/02_deploy_VC-V2.yaml
+  kubectl get all
+
+3) kubectl rollout undo deploy fb-deploy
+kubectl get all
+
+
+ClusterIp: for internal or within cluster communication
+============
+
+(Note: we want to know monolithic and micro-services architecture)
+
+monolithic: application is built as a single unit
+
+( a single bug can crash the whole app)
+
+microservices architecture: break down the application into small, independent services that communicate over APIs.
+
+clusterip-svc.yaml
+====================
+---
+apiVersion: v1
+kind: Service
+metadata:
+   name: fb-clusterip-svc
+   labels:
+       app: facebook
+spec:
+   type: ClusterIp
+   ports:
+      - port: 80
+        targetPort: 8080
+   selector:
+        app: facebook
+
+
+--> kubectl apply -f SERVICE-PRACTICE/clusterip-svc.yaml
+kubectl get all
+kubectl get svc
+
+(internal ip service is created)
+
+kubectl exec it <pod_name> -- bash
+curl <clusterip-svc ip>:80
+exit
+
+nodeport:
+===========
+nodeport range: 30000-32767
+
+nodeport-svc.yaml
+===========
+---
+apiVersion: v1
+kind: Service
+metadata:
+   name: fb-nodeport-svc
+   labels:
+     app: facebook
+spec:
+   type: NodePort
+   ports:
+      - targetPort: 8080
+        port: 80
+        nodePort: 30008
+
+   selector:
+       app: facebook
+
+==============
+kubectl apply -f SERVICE-PRACTICE/nodeport-svc.yaml
+
+kubectl get svc
+
+
+take any one of node's ip and access with nodePort.
+node publicip: 30008
+
+Note: make sure to add all traffic and anywhere under security groups
+
+
+load balancer--> nodeport and cluster ip will create
+nodeport: clusterip
+clusterip: clusterip (internally)
+
+kubectl delete svc --all
+kubectl get po
+kubectl delete all --all
+
+NAMESPACES:
+============
+
+how to create sub-clusters within a cluster.
+using namespaces
+namespace: Namespaces are Kubernetes objects which partition a single Kubernetes cluster into multiple virtual clusters.
+
+--> kubectl get ns
+[ default
+  kube-node-lease
+  kube-public
+  kube-system]
+
+kubectl create namespace lab
+kubectl get ns
+kubectl create ns uat
+kubectl create ns sandbox
+kubectl get ns
+
+kubectl get po
+
+kubectl apply -f deployment-practice/po1.yaml -n lab
+kubectl get po
+
+kubectl apply -f deployment-practice/po1.yaml -n uat
+kubectl get po
+
+(we can deploy same pod in multiple environments with in a single cluster===> same pod running  in different namespaces)
+
+
+
+manifest file for namespaces:
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+   name: <namespace_name>
+ 
+
+how to create pod in sbox through manifest file:
+----------------
+---
+apiVersion: V1
+kind: Pod
+metadata: 
+   name: fb-pod
+   namespace: sbox
+   labels:
+      app: facebook
+      env: lab
+spec:
+   containers:
+      - name: fbcont1
+        image: devopshubg333/batch15d: mcfbapp
+
+==========================================
+
+eksctl get cluster
+eksctl delete cluster b15dcluster
+==============================================
+
+17-apr-2025 --> MINI PROJECT ON KUBERNETES
+====================================
+sample application - voting application
+
+Eg: voting-app
+
+    POD (port 80)                5) POD (port 80)
+1) voting-app			    result-app
+   (python)			     (Node.JS)
+      |					|
+2) POD (port 6379)		4) POD (port 5432)
+   in-memory DB			   DB
+   redis		           Postgre SQL
+   ^					^		 
+    \					/
+     \				       /
+      \___________3) POD	______/
+		     worker
+                     (.Net)
+
+
+steps:
+
+in Git bash
+ set up a cluster with 7 nodes
+ eksctl get cluster
+kubectl get nodes
+
+in Visual Studio code,
+
+1) deploy pods (5)
+2) create services (ClusterIP)
+   1.redis
+   2.DB
+3) create services (NodePort or LoadBalancer)
+   1. voting-app
+   2. result-app
+
+in Git bash,
+4) apply all pod and services.yml files
+
+==> if any of the pod is deleted, the app is immediately hang-up
+so, it would be better to create deployments
+
+create deployments for above 5 pods in visualstudio code
+
+kubectl delete po --all
+kubectl get all
+
+
+18-APRIL-2025: RESOURCEREQUESTS & LIMITS
+================================
+
+Resource requests: A request is the amount of CPU and memory that Kubernetes will allocate to a container. When you specify
+a request, Kubernetes ensures that your container will always have at least that much resource available when it runs.
+
+Limits: The maximum amount of cpu and memory the container can use.
+If the container exceeds these, it may be throttled (CPU) or killed (Memory)
+
+==================
+1) pod-resourcerequests.yaml
+-----------------
+
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: example-pod
+spec:
+    containers:
+        - name: example-cont
+          image: nginx
+          resources:
+              requests:
+ 		  cpu: "500m"
+		  memory: "128Mi"
+	      limits:
+		  cpu: "1"
+		  memory: "256Mi"
+
+==========================
+--> ll
+
+--> kubectl apply -f pod-resourcerequests.yaml
+--> kubectl get po
+--> kubectl describe po example-pod
+--> env  (displays environment variables in laptop)
+
+
+ENV vs CONFIG vs SECRET:
+=========================
+ENV (Environment Variables):
+
+1) key-value pairs injected directly into pods/containers.
+2) App configs like port numbers, feature flags etc.,
+3) Env variables are Typically non-sensitive
+4) Not encrypted
+5) Easily visible in kubectl describe pod
+
+========================
+
+2) pod-env.yaml
+---------------
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: environment
+spec:
+    containers:
+        - name: nginx
+          image: nginx
+          env:
+            - name: course
+	      value: AWS DevOps
+            - name: Trainer
+	      value: "Madhu Kiran Gorekar"
+            - name: Institute
+	      value: MindCircuit
+
+=====================
+--> ll
+--> kubectl apply -f pod-env.yaml
+--> kubectl get po
+--> kubectl exec -it <pod_name> -- bash
+--> env
+--> exit
+--> kubectl get po
+--> kubectl describe po <pod_name>
+=====================
+
+Secrets and ConfigMaps are objects used to manage configuration data, sensitive information, and non-sensitive
+application settings in a secure and organized manner.
+They allow you to decouple configuration from application code, making it easier to manage and update configurations
+in a Kubernetes cluster.
+
+A ConfigMap is used to store non-sensitive, configuration-related data in the form of key-value pairs.
+ex: environment variables, configuration files, or command-line arguments.
+
+kubectl api-resources | grep configmap
+
+configmap creation:
+===================
+
+3) configmap.yaml
+-----------------
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: nginx-config-map
+data:
+    course: AWS DevOps
+    Trainer: Madhukiran Gorekar
+    Institute: Mindcircuit
+
+====================
+--> kubectl apply -f configmap.yaml
+--> kubectl get configmap
+--> kubectl describe configmap/cm nginx-configmap
+
+
+pod with configmap:
+==================
+
+4) pod-withconfigmap.yaml
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: pod-configmap
+spec:
+    containers:
+        - name: nginx
+          image: nginx
+	  envFrom:
+	      - configMapRef:
+		    name: nginx-configmap
+
+========================
+--> ll
+--> kubectl apply -f pod-withconfigmap.yaml
+--> kubectl get po
+--> kubectl describe po pod-configmap
+--> kubectl exec -it pod-configmap -- bash
+--> env
+--> exit
+--> kubectl get configmap/cm
+=========================
+ConfigMap: to store non-sensitive information
+Secret: to store sensitive information
+
+Secret:
+=======
+A Secret is used to store sensitive data, such as passwords, OAuth tokens, SSH keys, and API keys, in a way
+that is more secure than a plain ConfigMap. Secrets are encoded (base64), which helps to obscure their
+content but is not a fully secure solution; they are more secure than environment variables or plain text files.
+
+encode:
+echo -n "Madhukiran Gorekar" | base64  --> TWFkaHVraXJhbiBHb3Jla2Fy
+echo -n "AWS DevOps" | base64   --> QVdTIERldk9wcw==
+echo -n "mindcircuit" | base64  --> bWluZGNpcmN1aXQ=
+
+decode:
+echo -n "<encoded code>" | base64 --decode
+echo -n "<encoded code>" | base64 -d
+
+
+5) secret.yaml
+================
+---
+apiVersion: v1
+kind: Secret
+metadata:
+    name: pod-secret
+type: Opaque
+data: 
+    Course: <encoded value of "AWS DevOps">
+    Trainer: <encoded value of "Madhukiran Gorekar">
+    Institute: <encoded value of "mindcircuit">
+
+==============
+--> ll
+--> kubectl apply -f secret.yaml
+--> kubectl get secret
+--> kubectl describe secret pod-secret
+
+6) pod-withsecret.yaml
+========================
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: pod-secret
+spec:
+    containers:
+        - name: nginx
+          image: nginx
+	  envFrom:
+             - secretRef:
+                  name: pod-secret
+
+
+==================
+--> kubectl apply -f pod-withsecret.yaml
+--> kubectl describe po pod-secret
+--> kubectl exec -it pod-secret -- bash
+--> env
+--> exit
+
+*****************************************************
+
+Cluster upgrade in Kubernetes:
+*********************************
+--> kubectl delete all --all
+
+create a new cluster with old version.
+--> eksctl create cluster --name testcluster --version 1.30 --nodegroup-name testng --node-type t3.micro --nodes 2 --managed
+
+Note: here we need to do 2 things. 1) cluster upgrade and 2) nodegroup upgrade
+
+Upgrading the Kubernetes version can not be reversed. If you want a previous version you will need to create a new cluster.
+
+1) upgrade the cluster/control plane first.
+2)later click on that cluster>compute>nodegroups (update now)>update strategy(Rolling update)>update
+3) kubectl get nodes
+4)eksctl get cluster
+5) eksctl delete cluster testcluster
+6) eksctl delete cluster b15dcluster
+
+
+
+Labels vs Annotations
+========================
+Labels: Filtering purpose
+Annotations: General information
+Both are used for attaching metadata
+
+19& 20th APRIL 2025 --> NoClass
+========================
+
+ARGO CD -21st APRIL 2025--> end-to-end project
+=======================
+
+24th-APR-2025: Kubernetes quiz
+
+================================
+
+25th-APR-2025: KUBERNETES INGRESS
+=============================
+INGRESS:
+========
+Ingress exposes HTTP and HTTPS routes from outside the cluster to services within the cluster. Traffic routing is controlled by rules defined on the Ingress resource.
+An Ingress may be configured to give Services externally-reachable URLs, load balance traffic, terminate SSL / TLS, and offer name-based virtual hosting. An Ingress controller is responsible for fulfilling the Ingress, usually with a load balancer, though it may also configure your edge router or additional frontends to help handle the traffic.
+
+--> before containers and Kubernetes,(f5, nginx, haproxy  --> load balancers)  these load balancers used for enterprise production-grade loadbalancers.
+
+these load balancers provide some features like 
+-->path and host based routing
+-->also, sticky sessions --> eg: If there are 4 servers and user connected to a single server first, then all requests will go to that server
+only as the server is active and cache is formed already. Requests stick to one session
+
+--> ratio-based load balancing: two or more servers shares the load based on ratio.
+
+--> when users wants to move from VMs to containers, they feel some features are not available in Load balancers
+however, they are good with previous LBs (f5, nginx, haproxy etc)
+
+-> hence, Kubernetes came to a solution that previous Load Balancer companies have to write some logic (ingress controller) on respective LBs.
+--> Kubernetes side we have to write ingress resource.
+--> apply respective ingress controller logic to ingress resource, an endpoint url (single network load balancer is created on AWS EKS).
+
+eg: vote.xyz.com
+    result.xyz.com
+xyz: domain
+
+--> ingress controllers logics in manifest files are already written by respective load balancer companies.
+
+
+INGRESS - Advanced load balancing capabilities 
+
+Purchasing domain in Godaddy 
+Hosting it on route-53 & creating records 
+Ingress Host based and  path based routing
+
+
+=============
+eg: path based routing
+
+mk.com/login
+mk.com/logout
+mk.com/prducts
+-----------------------
+eg: Host based routing:
+
+login.mk.com
+logout.mk.com
+products.mk.com
+classes.mindcircuit.com
+====================================
+
+
+How to purchase a domain and link it to aws
+*********************************************
+1) we can purchase a domain in GoDaddy and link it to AWS by using Route53 service.
+--> go to GoDaddy and purchase domain b15catsvsdogs.xyz 
+--> My products (here we can see our purchased domains)
+we need to host this domain in our AWS(where the application exist) using Route53 service.
+Note: we can purchase domains in Route53 also, but requires more cost
+
+--> Route53> Get started> create hosted zones> Get started> 
+
+Create hosted zone
+==================
+Domain name: b15catsvsdogs.xyz
+
+Description: b15catsvsdogs.xyz
+Type: Public hosted zone
+Tags: 
+key: name		value: b15catsvsdogs.xyz
+create hosted zone
+
+--> To link the domain in AWS and domain which is created in Godaddy website
+we need to update the nameservers
+when we create a host zone, two records will be created (NS, SOA).
+--> select NS, in right under Record details, we can see Record Type NS
+and Value --> 4 ns servers
+
+--> need to update these 4 ns servers in Godaddy> Domain> Nameservers> change nameservers> I'll use my own nameservers
+and add those 4 nameservers from AWS.
+
+Save
+
+--> if user requests the domain(b15catsvsdogs.xyz) then the request will come to aws as we linked domain to aws
+eg: vote.b15catsvsdogs.xyz
+    result.b15catsvsdogs.xyz
+In last mini project, we used separate load balancers to access the vote and result.
+now we want to get both in a single loadbalancer using ingress concept
+***************************************************************
+
+Ingress concept: 
+ref url: https://kubernetes.io/docs/concepts/services-networking/ingress/
+******************
+1) create a folder for ingress-controller in Visualstudio code (k8-ingress-controller)
+--> keep type as " ClusterIP " instead of LoadBalancer in voting-app-service.yaml and result-app-service.yaml
+for remaining keep type as ClusterIP don't change (redis-service.yaml, postgre-servie.yaml )
+because now we want to use ingress-controller instead of Load Balancer
+
+
+2) open git bash (desktop>Kubernetes> MINI-PROJECT> k8s-miniporject-voting-app-withDeployment)
+create cluster with 6 or 8 nodes
+3) ll
+4) kubectl apply -f voting-app-deployment.yml
+5) kubectl apply -f voting-app-service.yml
+6)kubectl apply -f redis-deployment.yml
+7) kubectl apply -f redis-service.yml
+8) kubectl apply -f worker-app-deployment.yml
+9) kubectl apply -f postgres-deployment.yml
+10) kubectl apply -f postgres-service.yml
+11) kubectl apply -f result-app-deployment.yml
+12) kubectl apply -f result-app-service.yml
+
+13) kubectl get all
+14) kubectl get ingress/ing (to check ingress is existed or not)
+
+15) Install nginx-ingress-controller on EKS (ref url: https://spacelift.io/blog/kubernetes-ingress)
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.0/deploy/static/provider/cloud/deploy.yaml
+
+an advanced network load balancer is created in AWS
+
+16) kubectl get ing
+
+17) cd ../
+18) cd k8-ingress-controller
+19) ll
+20) kubectl apply -f vote-ingress.yml
+21) kubectl apply -f result-ingress.yml
+22) kubectl get ing
+
+23) go to EC2 --> Load Balancers
+ a network load balancer is created by ingress-controller
+
+24) now we want to connect the vote and result ingresses to network load balancer (ingress-controller),
+ we need to create a record in hosted zones under Route53
+
+create three Records one for 1) vote and another one for 2) result
+Record1
+
+Record name: vote
+enable alias
+Route traffic to: 
+choose endpoint: Alias to Network Load Balancer
+choose Region: US East (N.Virginia)
+choose network load balancer: <network load balancer url>
+
+Record2
+
+Record name: www
+enable alias
+Route traffic to: 
+choose endpoint: Alias to Network Load Balancer
+choose Region: US East (N.Virginia)
+choose network load balancer: <network load balancer url>
+
+Record3
+
+Record name: result
+enable alias
+Route traffic to: 
+choose endpoint: Alias to Network Load Balancer
+choose Region: US East (N.Virginia)
+choose network load balancer: <network load balancer url>
+
+3 records created
+
+25) in browser, access these things
+
+  vote.b15catsvsdogs.xyz
+  result.b15catsvsdogs.xyz
+
+26) Delete records except (NS, SOA)
+27) delete hosted zones (delete)
+28) eksctl delete cluster b15dcluster
+=================
+
+Note: add ingress.controller file in manifest files also.
+
+Note: how to check if NS records populate across the globe or not.
+Google--> DNS checker--> DNS check--> type "b15catsvsdogs"--> NS --> search
+ 
+=============================
+
+
+26th-APR-2025: Kubernetes Volumes
+===================================
+
+In Kubernetes, volumes are a way to provide persistent or shared storage to containers running in a pod. Unlike the ephemeral storage in a container (which disappears when the container is restarted), a volume exists as long as the pod exists, and sometimes even longer if it's backed by persistent storage.
+
+Pod-level Storage: Volumes are attached to pods, not individual containers. Multiple containers in the same pod can access the same volume.
+
+
+In Kubernetes, PV (PersistentVolume) and PVC (PersistentVolumeClaim) are used to manage persistent storage—storage that outlives the life of individual pods and containers.
+
+ PersistentVolume (PV)
+=====================
+A PersistentVolume is a piece of storage provisioned by an administrator or dynamically by Kubernetes using a StorageClass. It’s a resource in the cluster, just like CPU or memory.
+
+It abstracts the underlying physical storage (e.g., AWS EBS, NFS, GCE Persistent Disk, etc.).
+
+It is cluster-scoped, not tied to any one pod or namespace.
+
+🔸 PersistentVolumeClaim (PVC)
+=================================
+A PersistentVolumeClaim is a request for storage by a user (or a pod). It’s similar to how pods request CPU and memory.
+
+You define how much storage you need and the access mode.
+
+Kubernetes will bind the claim to an available PV that meets the criteria.
+
+🔄 How It Works Together
+===========================
+Admin/user creates a PV (or dynamic provisioning is enabled).
+
+User/pod creates a PVC.
+
+Kubernetes finds a matching PV and binds it to the PVC.
+
+Pod uses the PVC to mount the storage.
+
+
+
+there are two ways:
+
+1) static provisioning
+2) dynamic provisioning
+
+Storage Features:
+
+Eg: data present in our laptop only (ephemeral storage)
+    data present in hard disk or pendrive (AWS EBS (Elastic Block storage))
+    data present in google drive. everyone can access through internet (AWS File store)
+
+
+How to connect a outside volume (AWS EBS) to k8s cluster:
+**********************************************************
+1) create a cluster with 2 nodes with m5.large type.
+2) then, 2 volumes will be created in EBS for those 2 nodes by default.
+3) Now we have to provide access/permission to the two worker nodes in K8s cluster to access these two volumes in EBS.
+for that we need to install CSI drivers. and give IAM roles.
+Note: In K8s cluster, we have PV(Persistent volume) that refers the outside AWS EBS.
+pv>pvc>pod will access that claim.
+
+If pod is deleted then the data is stored in EBS.
+PV is abstraction of EBS.
+
+**********
+1) create EBS volume
+2) Install CSI drivers and assign IAM roles of EBS in k8s cluster worker nodes to access EBS volume
+3) create PV resource and PVC resources (manifest files)
+4) write pod manifest file and mount the volume
+*************
+
+Steps:
+1) Create a cluster through CLI or manifest file:
+
+CLI:
+eksctl create cluster --name b15dcluster --nodegroup-name b15dng --managed
+
+Through manifest file:
+====================
+
+clustersetup.yaml
+-----------------
+---
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: b15dcluster
+  region: us-east-1  
+nodeGroups:
+  - name: b15dng
+    spot: true
+    instanceType: m5.large  
+    desiredCapacity: 2       
+    minSize: 1
+    maxSize: 3
+    labels:
+        lifecycle: EC2Spot
+    tags:
+        "k8s.io/cluster-autoscaler/enabled": "true"
+        "k8s.io/cluster-autoscaler/b15dcluster": "owned"
+    iam:
+        withAddonPolicies:
+            autoScaler: true
+            ebs: true
+
+
+================
+eksctl create cluster -f clustersetup.yaml
+kubectl get nodes
+
+cluster created with 2 nodes
+
+========================
+
+2) Volumes
+-------------------
+pre-requisites:
+--> create a volume
+--> drivers install
+--> permissions setup -- using IAM role modification.
+------------------------------
+ * two types: static provisioning and dynamic provisioning.
+
+EC2> EBS > Volumes> create volume
+volume type: General Purpose SSD(gp3)
+size: 20 GB
+IOPS: 3000
+Throughput: 125 MB
+Availability zone:us-east-1b  (in which region, worker nodes are placed. we need to select the same zone)
+create volume --> volume created.
+
+--> install CSI drivers related to EBS.
+(ref url:https://github.com/kubernetes-sigs/aws-ebs-csi-driver/blob/master/docs/install.md)
+
+kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.42"
+
+it will be installed in Kubernetes configuration namespace (kube-system)
+
+--> kubectl get namespace
+--> kubectl get po -n kube-system
+
+3) how to give access to worker nodes on EBS volume which we newly created,
+
+Note: By default, worker nodes have IAM role.
+click on worker node(instance), got to IAM role (click it), there we can give EBS related permissions.
+
+permission policies> add permissions> attach policies> search " ebs" and select AmazonEBSCSIDriverPolicy>add permissions.
+
+Note: if we set permissions to one node then remaining nodes also will have the same permissions.
+
+4) In Visual Studio code, create these manifest files for volumes
+
+--> create a folder " k8s-Volumes"
+--> create a file " ebs-static.yaml"
+(in this file, we can include PV, PVC, POD, SERVICE manifest files)
+
+ebs-static.yaml
+------------------
+# persistent volume manifest file
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+    name: ebs-static
+spec:
+    accessModes:
+        - ReadWriteOnce  #volume can be mounted as read-write by only one node at a time.one pod(or multiple pods) on the same node can access it read/write  
+    capacity:
+        storage: 20Gi
+    csi:
+        driver: ebs.csi.aws.com
+        fsType: ext4
+        volumeHandle: vol-01f8b3cd1aea0f4e7 # newly created volume id
+
+
+# persistent volume claim manifest file
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: ebs-static
+spec:
+    storageClassName: ""
+    volumeName: ebs-static
+    accessModes:
+        - ReadWriteOnce
+    resources:
+        requests:
+            storage: 5Gi
+
+
+
+# pod with volume mount manifest file
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: ebs-static-pod
+    labels: 
+    purpose: ebs-static
+spec:
+   nodeSelector:
+       topology.kubernetes.io/zone: us-east-1b
+    containers:
+        - name: facebook
+	  image: devopshubg333/batch15d:httpd_amazonlinux
+	  volumeMounts:  # docker run -v hostpath: containerpath
+	     - name: ebs-static
+	       mountPath: /var/www/html
+    volumes:
+	- name: ebs-static
+	  persistentVolumeClaim:
+	        claimName: ebs-static
+   
+
+
+# service manifest file to access pods
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: fb-srv
+spec:
+    type: LoadBalancer
+    selector:
+        purpose: ebs-static
+    ports:
+        - port: 80  # service port
+          targetPort: 80 # container port
+
+====================
+
+--> kubectl apply -f ebs-static.yaml
+
+(persistent volume, persistent volume claim, pod, and service will be created)
+
+--> kubectl get pv
+--> kubectl describe pv ebs-static
+--> kubectl get pvc
+--> kubectl descrive pvc ebs-static
+--> kubectl get all
+--> kubectl describe po ebs-static-pod
+
+( pod must be in the same node in which zone we have created volume (us-east-1b)) --> use node selector
+
+--> kubectl get nodes --show-labels
+--> kubectl get svc
+(copy the load balancer external ip and access it in browser)
+
+--> kubectl exec -it ebs-static-pod -- bash
+bash-5.2# ls
+bash-5.2# echo "<h1>THIS IS TEST FACEBOOK PAGE FROM EBS STATIC VOLUME</h1>" > index.html
+bash-5.2# cat index.html
+bash-5.2# exit
+ 
+-->refresh the browser
+
+--> kubectl delete po ebs-static-pod (application is not accessible in browser)
+--> kubectl apply -f ebs-static.yaml
+
+(refresh the browser, we can access the application )
+
+--> kubectl api-resources
+
+( persistent volume --> namespace: false. i.e., it means that the persistent volume is not namespace level, it is cluster level)
+
+--> kubectl delete -f ebs-static.yaml
+
+--> eksctl get cluster
+--> eksctl delete cluster b15dcluster
+--> delete the created volume in EBS
+
+
+
+=======================
+27th-APR-2025: No class
+=======================
+
+
+28-APR-2025: KUBERNETES VOLUMES_STATIC AND DYNAMIC
+=============================
+
+1) eksctl get cluster
+2) kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.42"
+(CSI Drivers installed in cluster)
+3) kubectl get po ns kube-system
+4) create volume (give same region as anyone of node contains)
+5) set IAM role in cluster to interact with EBS volume
+select any worker node> security> IAM role>select on IAM role link>permissions> add permissions> attach policies
+>search "ebs" (AmazonEBSCSIDriverPolicy) and add permission.
+
+6) now write separate manifest files for PV, PVC, POD, and SERVICE
+
+7) 2-ebs-static-pv.yaml
+======================
+
+---
+apiVersion: v1 
+kind: PersistentVolume
+metadata:
+    name: ebs-static
+spec:
+    accessModes:
+        - ReadWriteOnce
+    capacity:
+        storage: 20Gi
+    csi:
+        driver: ebs.csi.aws.com
+        fsType: ext4
+        volumeHandle: vol-01f8b3cd1aea0f4e7  # created volume id
+
+======================
+
+8)kubectl apply -f 2-ebs-static-pv.yaml
+9)kubectl get pv
+
+10) 3-ebs-static-pvc.yaml
+===========================
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: ebs-static
+spec:
+    storageClassName: "" # empty string must be explicitly set otherwise default storageclass
+    volumeName: ebs-static
+    accessModes: 
+        - ReadWriteOnce
+    resources:
+        requests:
+            storage: 5Gi
+
+=======================
+11) kubectl apply -f 3-ebs-static-pvc.yaml
+12) kubectl get pvc
+
+
+
+13) Note: nginx is like httpd
+httpd path: /var/ww/html/index.html
+nginx index.html path: /usr/share/nginx/html/index.html
+
+kubectl get nodes
+kubectl get nodes --show-labels
+
+4-ebs-pod-svc.yaml
+=================
+---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: ebs-static-pod
+    labels:
+        purpose: ebs-static
+spec:
+    nodeSelector:
+        topology.kubernetes.io/zone: us-east-1c
+    containers:
+        - name: facebook
+          image: nginx
+          volumeMounts:
+              - name: ebs-static
+                mountPath: /usr/share/nginx/html
+    volumes:
+        - name: ebs-static
+          persistentVolumeClaim:
+            claimName: ebs-static
+
+---
+apiVersion: v1 
+kind: Service
+metadata:
+    name: fb-srv
+spec:
+    type: LoadBalancer
+    selector:
+        purpose: ebs-static
+    ports:
+        - port: 80
+          targetPort: 80
+
+====================
+
+ kubectl apply -f 4-ebs-pod-svc.yaml
+ kubectl get all
+
+(access service loadbalancer external ip in browser)
+
+--> deploy index.html in pod
+--> kubectl exec -it ebs-static-pod -- bash
+bash-5.2# ls
+bash-5.2# cd /usr/share/nginx/html/
+bash-52.# ls
+bash-5.2# echo "WELCOME TO FB PAGE FROM EBS STATIC P.VOLUME" > index.html
+bash-5.2# echo "<h1> WELCOME TO FB PAGE FROM EBS STATIC P.VOLUME </h1>" > index.html
+exit
+refresh the browser (service ip).
+
+--> kubectl delete po ebs-static-pod
+--> kubectl apply -f 4-ebs-pod-svc.yaml
+(refresh browser still we can access the application)
+
+--> kubectl delete -f 2-ebs-static-nginx-pv.yaml
+--> kubectl delete -f 3-ebs-pvc.yaml
+**********************************
+
+Dynamic provisioning
+====================
+--> don't need to create volume manually. it will create dynamically
+--> no need to create PV manually.
+
+Storage class:
+By default we will have a storage class: kubectl get sc
+
+ref url:
+https://github.com/kubernetes-sigs/aws-ebs-csi-driver/blob/master/examples/kubernetes/dynamic-provisioning/manifests/storageclass.yaml
+
+1) Install driver
+2) give permission (Attach ebs policy) to worker nodes
+3) Define storage class
+
+1.ebs-sc.yaml
+---------------
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ebs-sc
+provisioner: ebs.csi.aws.com
+reclaimPolicy: Retain  #default value is delete
+volumeBindingMode: WaitForFirstConsumer
+
+--> kubectl api-resources | grep sc
+--> kubectl apply -f 1-ebs-sc.yaml
+--> kubectl get sc
+
+
+now we need to claim that storage class
+
+(manifest file for PVC, POD and SERVICE)
+
+2-ebs-dynamic-pvc.yaml
+=======================
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: ebs-dynamic
+spec:
+    storageClassName: "ebs-sc"
+    accessModes:
+        - ReadWriteOnce
+    resources:
+        requests:
+            storage: 10Gi
+
+
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: ebs-dynamic
+    labels:
+        purpose: "ebs-dynamic"
+spec:
+    nodeSelector:
+        topology.kubernetes.io/zone: us-east-1c
+    containers:
+        - name: nginx
+          image: nginx
+          volumeMounts:
+	      - name: ebs-dynamic
+		mountPath: /usr/share/nginx/html
+    volumes:
+	- name: ebs-dynamic
+	  persistentVolumeClaim:
+		claimName: ebs-dynamic
+
+
+
+---
+apiVersion: v1
+kind: Service
+metadata: 
+    name: nginx-dynamic
+spec:
+    type: LoadBalancer
+    selector:		# Labels are used as selectors
+        purpose: "ebs-dynamic"
+    ports:
+       - protocal: TCP
+	 port: 80   #service port
+	 targetPort: 80
+
+=================================
+--> kubectl apply -f 2-ebs-dynamic-pvc.yaml
+--> kubectl get all
+
+new volume created automatically by the storage class.
+
+--> kubectl get sc/storageclass
+--> kubectl get pvc
+--> kubectl get po
+--> kubectl exec -it ebs-dynamic -- bash
+bash-5.2# ls
+bash-5.2# cd /usr/share/nginx/html
+bash-5.2# echo "<h1> WELCOME FROM EBS DYNAMIC VOLUME </h1>" > index.html
+bash-5.2# exit
+
+--> access the application from browser using service load balancer url
+
+--> kubectl api-resources
+--> kubectl delete -f 2-ebs-dynamic-pvc.yaml
+--> kubectl delete -f 1.ebs-sc.yaml
+--> eksctl get cluster
+--> eksctl delete cluster b15dcluster
+
+-----------------------------------
+
+29-APR-2025 -->NO CLASS
+========================
+
