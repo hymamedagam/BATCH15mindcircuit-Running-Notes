@@ -2148,4 +2148,394 @@ bash-5.2# exit
 
 29-APR-2025 -->NO CLASS
 ========================
+30-APR-2025 --> K8s Volumes using EFS 
+& StatefulSets
+
+================================
+EFS: Elastic File System (Network File System)
+
+--> slow compared to EBS
+--> used for regular and backup files.
+--> EBS has fixed size, but EFS has not fixed size it will increase automatically if needed.
+
+Static provisioning:
+
+1) CREATE EFS
+2) Install Drivers- EFS-CSI
+3) Access to IAM Role Of Worker Nodes
+
+
+1) create cluster with 2 nodes and m5.large size
+2) install efs csi drivers (ref link: https://github.com/kubernetes-sigs/aws-efs-csi-driver)
+
+(kubectl kustomize \
+    "github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernetes/overlays/stable/ecr/?ref=release-2.X" > private-ecr-driver.yaml)
+
+--> kubectl apply -k "github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernetes/overlays/stable/ecr/?ref=release-2.1"
+
+3) kubectl get po -n kube-system
+4) select any worker node>secuity> IAM role>permissions>add permissions> attach policies> AMAZONEFSCSIDRIVERPOLICY & AMAZONEBSCSIDRIVERPOLICY
+5) also, install ebscsidriver
+kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.42"
+
+6) create  fie system in EFS
+Name: b15defs
+VPC: (not default vpc) select eksctl-mccluster-cluster/VPC
+create file system
+
+Note: Basically EFS is a network file system.
+EFS interacts with Cluster --> csi drivers installed
+Cluster interacts with EFS --> Open related ports under security groups (NFS port number: 2049)
+
+7) EFS--> open created file system> network> select security group (already created by default)>copy security group id and search in security group section under Network& security> open that and edit inbound rules to allow worker nodes to access
+(edit in inbound rules--> NFS (protocol: TCP, Port range (2049), Source (Custom), copy worker node security group. save rules
+
+(only Kubernetes worker nodes can access the EFS through port 2049)
+
+8) need to create PV, PVC, SVC
+
+1)create aa manifest file for PV
+
+efs-static-pv.yaml
+================
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+    name: efs-static
+spec:
+    accessModes:
+        - ReadWriteOnce
+    capacity:
+        storage: 5Gi
+    storageClassName: ""
+    persistentVolumeReclaimPolicy: Retain
+    volumeMode: Filesystem
+    csi:
+        driver: efs.csi.aws.com
+        volumeHandle: fs-022b028cf12280b9a  #copy filesystem id
+
+
+================
+==> kubectl apply -f efs-static-pv.yaml
+--> kubectl get all
+
+2) create a manifest file for PVC
+
+efs-static-pvc.yaml
+====================
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: efs-static
+spec:
+    accessModes:
+        - ReadWriteOnce
+    storageClassName: ""
+    volumeName: "efs-static"
+    resources:
+        requests:
+            storage: 5Gi
+========================
+
+--> kubectl apply -f efs-static-pvc.yaml
+--> kuebctl get all
+
+
+Note: storageClassName is empty for static
+      we can provision storageClassName when it is dynamic.
+
+--> kubectl get pv
+--> kubectl get pvc
+
+3) create a manifest file pod and service
+
+efs-pod-svc.yaml
+==========================
+---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: efs-static
+    labels:
+        purpose: "efs-static-demo"
+spec:
+    containers:
+        - name: nginx
+          image: nginx
+          volumeMounts:
+              - name: persistent-storage
+                mountPath: /usr/share/nginx/html
+    volumes:
+        - name: persistent-storage
+          persistentVolumeClaim:
+              claimName: efs-static
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: nginx-lb
+spec:
+    type: LoadBalancer
+    selector:  # labels are used as selectors
+        purpose: "efs-static-demo"
+    ports:
+        - port: 80  # service port
+          targetPort: 80
+=================================
+--> kubectl apply -f efs-pod-svc.yaml
+--> kubectl get svc
+--> kubectl get po
+
+--> deploy index.html in pod
+--> kubectl exec -it efs-static-pod -- bash
+bash-5.2# ls
+bash-5.2# cd /usr/share/nginx/html/
+bash-52.# ls
+bash-5.2# echo "WELCOME TO FB PAGE FROM EFS STATIC P.VOLUME" > index.html
+bash-5.2# echo "<h1> WELCOME TO FB PAGE FROM EFS STATIC P.VOLUME </h1>" > index.html
+exit
+refresh the browser (service ip).
+
+--> kubectl delete po efs-static-pod
+--> kubectl apply -f efs-pod-svc.yaml
+(refresh browser still we can access the application)
+--> kubectl delete -f efs-pod-svc.yaml
+--> kubectl delete -f efs-static-pvc.yaml
+--> kubectl delete -f efs-static-pv.yaml
+
+
+Dynamic provisioning using EFS:
+=============================
+1) In efs, file system is created by kuberentes admin (not devops engineer and it will not create automatically)
+2) create storageclass
+
+efs-dynamic-sc.yaml
+===========
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+    name: efs-dynamic
+provisioner: efs.csi.aws.com
+parameters:
+    provisioningMode: efs-ap
+    fileSystemId: fs-022b028cf12280b9a
+    directoryPerms: "700"
+    basePath: "/facebook"
+=================
+--> kubectl apply -f efs-dynamic-sc.yaml
+
+3) create pvc
+
+efs-dynamic-pvc.yaml
+----------------------------
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: efs-dynamic
+spec:
+    accessModes:
+        - ReadWriteOnce
+    storageClassName: "efs-dynamic"
+    resources:
+        requests:
+            storage: 5Gi
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: efs-dynamic
+    labels:
+        purpose: "efs-dynamic-demo"
+spec:
+    containers:
+        - name: nginx
+          image: nginx
+          volumeMounts:
+              - name: perssistent-storage
+                mountPath: /usr/share/nginx/html
+    volumes:
+        - name: perssistent-storage
+          persistentVolumeClaim:
+              claimName: efs-dynamic
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: nginx-lb
+spec:
+    type: LoadBalancer
+    selector:
+        purpose: "efs-dynamic-demo"
+    ports:
+        - protocol: TCP
+          port: 80
+          targetPort: 80
+
+==========================
+--> kubectl apply -f efs-dynamic-pvc.yaml
+--> kubectl get all
+-->kubectl get pv,pvc,sc
+
+
+==> PV created in EFS> FILE SYSTEM> access points
+
+===> kubectl delete -f efs-dynamic-sc.yaml
+--> kubectl delete -f efs-denamic-pvc.yaml
+
+
+
+STATEFUL SET
+=================
+--> it is also a controller manager. manages the stateful applications
+while, deployment is for stateless applications
+
+--> kubectl apply -f 01_deploy_AC-V1.yaml
+--> kubectl get all
+kubetl delete po <pod_name>
+if one pod is deleted, another pod is create automatically.
+
+Deployment: service will send requests to any pod
+statefulset: service sends requests to only particular (primary pod)
+
+eg: Database (MySQL)--> cluster setup (one is primary pod, other are read-replicas)
+--> contains single primary node/pod(readwrite) and remaining are stand-by pods (read-replicas)
+--> if any user wants to update records in DB, they must connect to this primary pod. Later the info, sinks to other pods.
+--> pod in databases must maintain the state.
+--> if pod is deleted, then it must create again with the same name. this is called maintaining state (stable identity)
+--> we need to create Headless service. it means regardless of service( clusterIp, NodePort, Load Balancer)
+this headless service sends the requests to the particular pod)
+
+--> Pod Name identity: pod-0, pod-1,pod-2
+if pod-0 is deleted, then it will create another pod with same name
+pods are created in order(pod-0,pod-1,etc.,)
+
+
+what is headless service in k8s
+==================================
+In Kubernetes, a headless service is a special type of service without a cluster IP. It allows direct access to the individual Pods behind the service instead of load-balancing traffic among them.
+
+
+Headless service yaml file:
+============================
+---
+apiVesrsion: v1
+kind: Service
+metadata
+    name: my-headless-service
+spec:
+    clusterIP: None  # This makes it headless
+    selector: 
+        app: my-app
+    ports:
+        - port: 80
+          targetPort: 80
+
+================================
+
+eg: take example of dynamic provisioning of ebs
+
+--> kubectl delete -f 01_deploy_AC-V1.yaml
+cd ../
+cd k8s-STATEFULSETS/
+ll
+--> kubectl apply -f 1-ebs-dynamic-sc.yaml
+--> kubectl get sc
+(ebs dynamic storage class is created)
+
+--> create a statefulset yaml file
+  2-nginx-statefulset.yaml
+-------------------------------
+ # define headless service
+ # define statefulset 
+
+1) kubectl apply -f 2-nginx-statefulset.yaml
+2)kubectl get sc
+3) kubectl get all
+
+4) kubectl delete po nginx-0
+( if nginx-0 is deleted, again it will create the same pod (nginx-0))
+
+5)kubectl get pvc ( each pod gets their own pvc)
+6) kubectl get po
+7) kubectl get pv (each pod gets their own pv)
+ (check in EBS--> volumes)
+ll
+8) kubectl delete -f 2-nginx-statefulset.yaml
+9) kubectl delete -f 1-ebs-dynamic-sc.yaml
+delete efs , delete volumes (created for pods), security groups(edit inbound rules, delete rule which we added)
+10) eksctl delete cluster mccluster
+vpc> delete the eksctl-mccluster-cluster/VPC
+
+**************************************************************
+01-MAY-2025: HPA ( Horizontal Pod AutoScaler)
+===============================================
+--> Manually scale up/down the pods
+1) kubectl scale deploy <deployment_name> --replicas 3
+2) kubectl edit deploy <deployment_name>
+3) directly modify in manifest file
+
+
+--> Automatically scale up/down pods
+1) if there are 2 pods, when there is load when we configure some thresholds or cpu/RAM utilization
+breaches the threshold, immediately a new pod is created as per the demand
+ if there is no load, then the pod should automatically deleted.
+
+Horizontal Pod Autoscaler: create separate pods based on load.
+
+
+Note: In aws, vertical auto scaling: increase the cpu/memory within that node only.
+horizontal autoscaling: create separate nodes
+
+In aws, we can do both vertical and horizontal auto-scaling
+
+in k8s, we can only do horizontal pod autoscaling.
+
+1) kubectl apply -f clustersetup.yaml
+2) kubectl get nodes
+3) eksctl get cluster
+4) kubectl get po -n kube-system
+
+5) cd k8s-HPA/
+6)ll
+7) kubectl apply -f kpa-demo.yaml
+8) kubectl get all
+9) kubectl get hpa
+10) how does k8s cluster will get to know the cpu utilization.
+to collect metrics, need to install metricserver
+
+ref link:https://github.com/kubernetes-sigs/metrics-server/blob/master/README.md
+
+11) kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability-1.21+.yaml
+12) kubectl get all -n kube-system
+metricserver pods tracks the cpu utilization
+
+13) kubectl get all
+14) ( need to increase cpu utilization for testing if load increases then new pods are creating or not)
+# Run this in a separate terminal
+# so that the load generation continues and you can carry on with the rest of the steps
+kubectl run -i --tty load-generator --rm --image=busybox:1.28 --restart=Never -- /bin/sh -c "while sleep 0.01; do wget -q -O- http://php-apache; done"
+
+15) kubectl get all
+(cpu utilization increased/breached threshold, new pod created)
+
+16) kubectl top po <pod_name>
+(to know load)
+
+(abort load generator in powershell terminal --> ctrl+c)
+17) kubectl get all
+
+===========================
+
+Daemon Set:
+================
+
 
