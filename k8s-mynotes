@@ -2537,5 +2537,34 @@ kubectl run -i --tty load-generator --rm --image=busybox:1.28 --restart=Never --
 
 Daemon Set:
 ================
+Deployment: if entire node is down, then the existing pod in that node will create again on another node (at any point of time, the pod remains up)
+Daemon Set: It is a k8s object. each node should have single pod. If the pod is deleted, it will create new pod in the same node only which it exists previously.
+if node is deleted, no pod will create on that node.
+
+use case: If health check is happening on a node, then k8s will collect metrics, configuration by deploying an agent( Prometheus or Grafana) on each node in the form of pod.
+
+that pod collects the data from the worker node.
+--> Daemon set is used to collect metrics agents, logs agents on worker node in the backend.
+kube-proxy: an agent that enables network communication on worker node.
+
+==> each worker node will have kube-proxy as a daemon set.
+(if kube-proxy deleted on the worker node. it will again create new kube-proxy on the same node itself)
+
+--> kubectl get all
+--> kubectl get all -n kube-system
+
+--> EC2> auto scaling group> click on existing autoscaling group and edit the desired count
+( increasing desired count on worker node) so that new worker node is created with kube-proxy
+
+--> kubectl get all -n kube-system
+
+Note: refer differences between Deployment and Daemon Set
+
+cd ../../
+ll
+
+kubectl apply -f Daemonset.yaml
+kubectl get all
+
 
 
