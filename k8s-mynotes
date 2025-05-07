@@ -2565,6 +2565,143 @@ ll
 
 kubectl apply -f Daemonset.yaml
 kubectl get all
+eksctl delete cluster
+==================================
 
+02-MAY-2025: K8s HELM
+==========================
+Helm --> Package manager for Kubernetes
+Kubernetes Helm is a package manager for Kubernetes—think of it like apt for Ubuntu or yum for CentOS, but specifically for Kubernetes applications.
+
+What Helm Does
+Helm helps you define, install, and upgrade even the most complex Kubernetes applications using Helm charts. A chart is a collection of files that describe a related set of Kubernetes resources.
+
+Why Helm Is Needed
+Managing Kubernetes apps manually with raw YAML files can be:
+
+Tedious (many files to track),
+
+Error-prone (copy-paste mistakes, inconsistent values),
+
+Hard to upgrade or rollback, and
+
+Difficult to manage across environments (dev, staging, prod).
+
+Helm solves this by:
+
+Allowing you to template your Kubernetes manifests,
+
+Supporting versioning and rollbacks,
+
+Making installs, upgrades, and deletions repeatable,
+
+Supporting parameterized configuration via values.yaml.
+
+✅ Benefits
+Simplifies deployment of complex apps (like Prometheus, MySQL, or NGINX Ingress).
+
+Makes apps portable across teams and environments.
+
+Improves CI/CD pipelines by standardizing Kubernetes resource definitions.
+----------------------------------
+
+1) google--> helm install on windows> install trough chocolety
+open powershell> right click "run as administrator"
+--> choco install kubernetes-helm
+(choco install kubernetes-helm --force  --> to re-install)
+(choco upgrade kubernetes-helm --> to upgrade)
+
+====================
+1) open git bash and create cluster with 2nodes (m5.large)
+2) eksctl get cluster
+3) kubectl get nodes
+4) kubectl get all
+
+5) install helm related plugins in visual studio code
+Helm Intellisense
+yaml>settings> yaml:schemas>
+
+6) create a folder in Visual Studio code (Helm-Practice)
+and create a file in that (Chart.yaml)
+
+ref url for helm charts syntax: https://helm.sh/docs/topics/charts/
+
+chart.yaml
+============
+---
+apiVersion: v2
+name: fbapp
+version: 1.0.0  # Helm chart version
+appVersion: 1.3.3 # application version (application in Helm chart)
+description: This is sample facebook application deployment
+
+
+7) create another sub-folder in Helm-Practice (templates)
+(add these yaml files)
+01_deployment_AC-V1.yaml
+nodeport-svc.yaml
+8) values.yaml
+
+9) in git bash,
+
+--> ll
+--> cat chart.yaml
+(name is fbapp)
+--> helm install fbapp .
+(fbapp deployed in default namespace)
+
+kubectl get all
+
+--> eg: change imageversion to python_flaskapp and nodeport to 32222) in values.yaml
+
+--> helm upgrade fbapp .
+(new image (python_flaskapp) deployed)
+
+--> kubetl get all
+--> helm history fbapp
+
+
+--> eg: change imageversion to httpd_amazonlinux and nodeport to 32222) in values.yaml
+
+--> helm upgrade fbapp .
+--> kubetl get all
+
+Rollback to previous revisions:
+=============================
+--> helm rollback fbapp 2
+--> helm history fbapp
+--> kubectl get po
+--> kubectl get all
+
+Note: ref url for ebs csi driver install using helm: https://github.com/kubernetes-sigs/aws-ebs-csi-driver/blob/master/docs/install.md
+
+Helm
+
+--> Add the aws-ebs-csi-driver Helm repository.
+
+helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
+helm repo update
+
+--> Install the latest release of the driver.
+
+helm upgrade --install aws-ebs-csi-driver \
+    --namespace kube-system \
+    aws-ebs-csi-driver/aws-ebs-csi-driver
+
+--> kubectl get po -n kube-system
+--> helm list
+--> helm list -n kube-system
+
+--> helm uninstall fbapp
+--> kubectl get po
+
+
+search: helm day to day commands for devops engineers
+
+=============================
+03(sat), 04(sun), 05th(Mon)-MAY-2025: No Class
+=============================
+06-may: Advanced scheduling
+==========================
 
 
