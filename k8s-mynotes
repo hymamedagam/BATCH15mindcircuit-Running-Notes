@@ -2703,5 +2703,110 @@ search: helm day to day commands for devops engineers
 =============================
 06-may: Advanced scheduling
 ==========================
+Normally, scheduler schedules the pod on right node based on resources availability, and constraints.
+------------
+scenario-1) we can schedule pods on specific node which we want. --> specific node
+(what if that specific node doesn't have resources, our pod will be pending)
+scenario-2) based on labels selection (eg: if two nodes contains same labels (env=prod), what if two nodes have no resources (CPU and RAM already occupied, no space), our pod will be pending)
+scenario-3) more flexibility ( we are telling them to first check labels on those two nodes, if no space look at other nodes.)
+
+-------------
+
+1) schedule on specific node: 1-nodename.yaml
+nodeName:<nodename>  it is a simplest way to choose a node
+nodeName: ip-192-168-39-84.ec2.internal
+-------------------------
+2) eg: if two nodes have same labels(env=prod) you can select any node to schedule a pod among two : 2-nodeselector.yaml
+node selector:
+kubectl label nodes <nodename> environment=prod  --> to give label to a node
+kubectl  label nodes ip-192-168-39-84.ec2.internal env=prod
+-----
+Limitations of node selector:
+
+==> limited to exact label matches (no complex logic like "OR","NOT", or "ranges").
+No support for soft preferences (e.g., prefer a node but fall back to others if unavailable)
+Less expressive for advanced scheduling requirements.
+Use cases: When you need straight forward, mandatory scheduling on nodes with specific labels.
+--------------------------------
+3) node affinity: 3-nodeaffinity.yaml
+
+--> Both nodeselector and nodeaffinity are used to control which nodes a Pod can be scheduled on, but:
+1) nodeSelector:
+--> simple key-value match
+--> Only supports euality-based matches (eg: env=prod)
+eg: nodeSelector: { "env": "prod" }
+
+2) nodeAffinity:
+--> More powerful and flexible
+--> supports:
+    --> requiredDuringSchedulingIgnoredDuringExecution (strict rules)
+    --> preferredDuringSchedulingIgnoredDuringExecution (soft preference)
+Allows:
+ In, NotIn, Exists, DoesNotExist, Gt, Lt match expressions
+
+-------------------
+
+4) nodeantiAffinity: 4-nodeantiaffinity.yaml
+
+5) taint: reservation type: 5-taint-tolerations.yaml
+
+  give taint to node so other pods can't use it
+tolerations: give tolerations to pods so that the pods can use the tainted node
+
+kubectl taint nodes <worker-node-1> key=value:NoSchedule
+kubectl taint nodes <worker-node-1> critical=true:NoSchedule
+(so no pod will schedule on this node)
+
+if we give below toleration, then the pod will schedule on tainted node.
+--------
+spec:
+    tolerations:
+        - key: "critical"
+	  operator: "Equal"
+	  value: "true"
+	  effect: "NoSchedule"
+
+==========
+NoSchedule: pod will not be scheduled unless it has a matching toleration
+PreferNoSchedule: k8s tries to avoid scheduling non-tolerant pods, but may do so
+NoExecute: Existing pods are evicted unless they tolerate the taint.
+
+=====================
+1) open git bash, create a cluster 
+eksctl create cluster --name b15dcluster --nodegroup-name b15ng --node-type t3.micro --nodes 4 --managed
+2) eksctl get cluster
+3) kubectl get nodes
+4) kubectl apply -f 1-nodename.yaml
+5) kubectl get po
+6) kubectl get po -o wide
+
+7) kubectl get nodes --show-labels
+8) kubectl  label nodes ip-192-168-39-84.ec2.internal env=prod
+9) kubectl  label nodes ip-192-168-15-203.ec2.internal env=prod
+10) kubectl delete -f 1-nodename.yaml
+11) kubectl apply -f 2-nodeselector.yaml
+12) kubectl get po -o wide
+13) kubectl delete -f 2-nodeselector.yaml
+14) kubectl get nodes --show-labels | grep env=prod
+15) kubectl apply -f 3-nodeaffinity.yaml
+16) kubectl get po -o wide
+17) kubectl delete -f 3-nodeaffinity.yaml
+18) kubectl apply -f 4-nodeantiaffinity.yaml
+19) kubectl get po -o wide
+
+
+22) kubectl taint nodes ip-192-168-30-85.ec2.internal critical=true:NoExecute
+23) kubectl apply -f 6-node-toleration.yaml (without adding toleration part)
+(pod can not be scheduled because node is tainted and we didn't give toleration to pod)
+
+24) kubectl apply -f 6-node-toleration.yaml (after adding toleration part)
+pod scheduled on tainted node because we gave tolerations for that pod
+
+25) kubectl get po -o wide
+
+eksctl delete cluster b5dcluster
+
+
+==============end==========================
 
 
