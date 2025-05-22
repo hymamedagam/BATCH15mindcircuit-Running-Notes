@@ -1,0 +1,385 @@
+ANSIBLE:
+
+1. INSTALL ANSIBLE ON CONTROL/ MASTER SERVER
+2. SETUP SSH PASSWORD LESS AUTHENTICATION TO ALL WORKER NODES / CLIENT SERVERS
+
+( WATCH CLASS RECORDING FOR DETAILED EXPLANATION- how to generate sshkeys.. etc  ) 
+
+
+SETUP ANSIBLE PRATICE FOLDER AND CREATE A Inventory / host file  
+ 
+ 
+cd /opt/
+sudo vim inventory 
+ 
+[appservers]
+172.31.37.67
+#2.3.4.5
+
+[dbservers]
+172.31.35.163
+172.31.19.64
+
+[util]
+#1.2.3.4
+
+localhost
+
+=====================================================
+
+
+  ansible -i inventory -m ping all
+  ansible -i inventory -m ping dbservers
+  ansible -i inventory -m ping appservers
+  ansible -i inventory -b -a "touch /opt/f1"
+  ansible -i inventory appservers -b -a "touch /opt/f1"
+  ansible -i inventory appservers  -a "touch /opt/f2"
+  ansible -i inventory appservers  -a "sudo touch /opt/f2"
+  ansible -i inventory appservers -b  -a "sudo mkdir /opt/dir1"
+  ansible -i inventory appservers -b  -a "sudo ls"
+  ansible -i inventory appservers -b  -a "ls -lrth"
+  ansible -i inventory appservers -b  -a "useradd madhu"
+  ansible -i inventory appservers -b  -a "tail -2 /etc/passwd"
+  ansible -i inventory appservers -b  -a "ls -lrth /opt"
+  ansible -i inventory appservers -b  -a "pwd"
+  ansible -i inventory appservers -b  -a "ls -la"
+  
+  ansible -i inventory appservers -m user -a "name=madhu1 state=present"
+  ansible -i inventory appservers -b -m user -a "name=madhu1 state=present"
+  ansible -i inventory appservers -b  -a "useradd madhu2"
+  ansible -i inventory appservers -b  -a "tail -5 /etc/passwd"
+  ansible -i inventory appservers -b  -a "yum install git -y"
+  ansible -i inventory appservers -b  -a "yum remove git -y"
+  
+USING MODULES:
+
+Ansible modules are units of code that can control system resources or execute system commands. Ansible provides a module library that you can execute directly on remote hosts or through playbooks. You can also write custom modules.
+
+units of code that can be used from the command line or in a playbook task. Ansible executes each module, usually on the remote managed node, and collects return values.
+  
+ansible all -b -a "useradd mounika1"
+ansible all -m user -b -a "state=present name=mounika2 "
+
+ansible all -m copy -b -a "src=path/of/file dest=/path"
+
+ansible all -m yum -b -a "name=git"
+ansible all -m yum -b -a "name=git state=preasent"
+
+ansible all -a "yum install git -y" -b
+ansible all -b -a "yum install git -y"
+
+ansible all -m yum -b -a "name=git state=present"
+
+ansible all -m yum -b -a "name=git state=absent"
+
+ansible all -b -a "yum remove git -y"
+
+ansible all -m yum -b -a "name=httpd state=present"
+
+ansible all -m service -b -a "name=httpd state=started"
+
+ansible all -b -a "service httpd start"
+
+ansible devops -b -a "service httpd start"
+ansible all -m service -b -a "name=httpd state=started"
+Ex: reloaded, restarted, started, stopped
+
+
+ansible all -m yum -b -a "name=java state=latest"
+
+ansible all -b -a "useradd user1"
+
+ansible all -m user -b -a "name=alekhya state=present"
+
+ansible devops -b -a "userdel user1"
+
+ansible all -m user -b -a "name=alekhya state=absent"
+
+ansible all -b -a "mkdir /opt/ooooo1"
+
+ansible all -b -a "touch /opt/abc"
+
+/
+ansible all -m file -b -a "path=/opt/k8s state=touch"
+
+ansible all -m file -b -a "path=/opt/456dir state=directory"
+  
+  
+  
+  ansible -i inventory appservers -m yum  -b  -a "name=git state=present"
+  ansible -i inventory appservers -m yum  -b  -a "name=git state=absent"
+  ansible -i inventory appservers -m shell -b -a "git status"
+  ansible -i inventory appservers -m shell -b -a "git --version"
+  ansible -i inventory appservers -m yum -b -a "name=httpd state=present"
+
+  ansible -i inventory  -b -m yum -a "name=httpd state=present"
+  ansible -i inventory appservers  -b -m yum -a "name=httpd state=present"
+  ansible -i inventory appservers  -b -m service -a "name=httpd state=present"
+  ansible -i inventory appservers  -b -m service -a "name=httpd state=started"
+  ansible -i inventory appservers  -b -m shell -a "service httpd status"
+  ansible -i inventory appservers  -b -m shell -a "systemctl status httpd"
+  ansible -i inventory appservers  -b -m copy -a "src=/tmp/index.html dest=/var/www/html/index.html"
+  ansible -i inventory appservers  -b -m copy -a "src=/tmp/index.html dest=/var/www/html/index.html" -v-
+  ansible -i inventory appservers  -b -m copy -a "src=/tmp/index.html dest=/var/www/html/index.html" -v
+  ansible -i inventory appservers  -b -m copy -a "src=/tmp/index.html dest=/var/www/html/index.html" -vv
+  ansible -i inventory appservers  -b -m copy -a "src=/tmp/index.html dest=/var/www/html/index.html" -vv
+
+  ansible -i inventory appservers  -b -m copy -a "src=/tmp/abc.html dest=/var/www/html/index.html" -vvv
+  cd /tmp/
+  ll
+  ansible -i inventory appservers  -b -m copy -a "src=/tmp/abc.html dest=/var/www/html/index.html" -vvv
+  ansible -i inventory all  -b -m copy -a "src=/tmp/abc.html dest=/var/www/html/index.html"
+
+
+
+===============================
+
+ANSIBLE PLAYBOOK:
+
+playbook's  format -->    yaml or yml
+
+
+It uses configuration files called Playbooks written in YAML. 
+
+Ansible modules are standalone scripts that can be used inside an Ansible playbook. A playbook consists of a play, and a play consists of tasks. 
+
+
+yaml - one of the data structure format to represent data .
+       yaml file is used to represent data , in our case ansible configuration data
+
+for ex : 
+
+server details :
+
+name = mcserver1
+owner = madhukiran 
+created = 8 may 25 
+status = active 
+
+----
+name = mcserver2
+owner = santhosh
+created = 8 may 25 
+status = active 
+
+
+
+
+diff b/w  XML  VS JSON VS YAML FORMATS :
+
+-----------------------------------
+ways to Representation of Data in YAML :
+
+-------------
+key-value pair 
+
+name = mcserver1
+owner = madhukiran 
+
+-------------------
+Array/ List - 
+
+- java 
+- jenkins 
+
+Fruits:
+
+- apple
+- grape 
+- banana
+- orange  
+-------------------
+
+Dictionary - Set of properties , grouped together
+
+Orange:   
+   Calories: 50
+      Carbs: 5g
+   Fat: 0.1 g
+   
+   
+make sure we are giving spaces properly 
+ - equal no of spaces 
+===========
+
+sudo vim play1.yaml
+----------------------------
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: Installing git package
+    yum: 
+	  name: git 
+	  state: present
+
+:wq!
+============================
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: Installing git package
+    yum: 
+      name: git
+      state: present
+
+
+
+ansible-playbook play1.yaml
+
+
+===============
+
+vim httpd.yaml :
+
+---> check class notes 
+
+
+
+===========================================================
+
+
+
+
+
+
+
+sudo vim play6.yml
+-------------------------------
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: Installing no.of package
+    yum: name=git,httpd,wget,java state=present
+
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: removinfg  no.of package
+    yum: name=git,httpd,wget,java  state=present  
+
+or
+
+sudo vim play7.yml
+-------------------------------
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: Installing no.of packages
+    yum: state=present name={{item}}
+    with_items:
+    - git
+    - httpd
+    - wget
+	- java
+	- xyx 
+	- abc 
+
+---------------------
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Install necessary packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - git
+        - httpd
+        - wget
+        - java
+        - xyz
+        - abc
+      tags:
+        - install_packages
+
+###    
+{{ item }} is a special kind of variable used in loops in Ansible.
+
+
+===========================
+Jinja2 templating syntax 
+
+TEMPLATE module 
+
+===================
+
+
+
+HOW TO DO CONF AUTOMATION ON  MASTERSERVER IN ANSBLE CONTROL 
+
+
+=======================================
+ANSIBLE HANDLERS 
+
+
+======================
+
+ANSIBLE VARIABLES 
+
+===============
+
+ANSIBLE ROLES :
+
+your_role_name/
+├── defaults/
+│   └── main.yml          # Default variables (lowest priority)
+├── vars/
+│   └── main.yml          # Variables with higher priority
+├── files/
+│   └── ...               # Static files to copy (e.g., config files, packages)
+├── templates/
+│   └── ...               # Jinja2 templates (e.g., .j2 files)
+├── tasks/
+│   └── main.yml          # Main list of tasks to run
+├── handlers/
+│   └── main.yml          # Handlers triggered by tasks (e.g., service restart)
+├── meta/
+│   └── main.yml          # Role metadata (dependencies, author info)
+├── README.md             # Documentation (optional but recommended)
+└── tests/
+    └── test.yml          # Test playbook to verify role
+
+
+=============
+
+Modularization	
+        Breaks down playbooks into smaller, reusable, and independent units of configuration.
+		
+Reusability	
+          Roles can be reused across different playbooks or projects, reducing duplication.
+		  
+Maintainability	
+         Makes it easier to maintain and update configurations by organizing them into distinct sections.
+		 
+Scalability	
+            Helps manage complex systems and scale automation as infrastructure grows.
+Collaboration	
+          Provides a clear structure that improves team collaboration by dividing tasks into specific roles.
+
+
+
+==============================================
+
+ROLES:
+
+sudo ansible-galaxy init <rolename>
+cd <rolename> 
+	
+---
+- hosts: all 
+  become: yes 
+  roles:
+    - {role: httpdrole}
+	- {role: tomcatrole} 
+	
+
+============================================
+
+
+======
