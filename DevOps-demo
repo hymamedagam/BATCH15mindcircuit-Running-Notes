@@ -1,0 +1,120 @@
+SDLC: Software Development Life cycle
+--> It is a structured process for developing software applications, ensuring high quality and efficiency.
+It consists of several phases:
+planning: defines project scope, feasibility, and system resources
+Requirements analysis: Gather and document user and system requirements
+Design: create system architecture, UI UX design, and database models
+Implementation(coding): Developers write and test the actual code
+Testing: Perform unit, integration, system and user acceptance testing
+Deployment: Release software to production
+Maintenance: Fix bugs, provide updates, enhance features
+
+Common SDLC models are: waterfall, agile, v-model, spiral, and DevOps
+
+DevOps: DevOps is a combination of Development and operation team activities.
+It is a methodology, culture, a strategy.
+It automates the process of SDLC.
+
+Waterfall approach: Waterfall model is a process where the development of new phase begins only after the completion of previous phase.
+Difficulty in this approach:
+1)here development work takes longer duration of time
+2) By the time of product is released to the market, customer requirements is changed.
+3) As a result, customer might lose interest in the product due to it's extended development, or change in his requirement.
+
+Agile Approach: Agile model breaks down the product development work into smaller iterations to minimize the upfront required for planning and design.
+
+Agile solves the drawbacks of waterfall model by:
+1) Releasing a product in iterations not at one go
+2) Accepting changes in requirements at different iterations
+
+Difficulty in Agile approach:
+1) lack of collaboration between developer and operation teams, slowed down the development process and product release
+2) It does not automate the steps followed at different iterations.
+
+Note: Code worked in Development side, but it is not worked in operations side due to dependency issues, slowed down the product release.
+
+DevOps: It is a strategy which bridges the gap between developer and operation teams, helps to deliver software on time.
+--> It quickly, easily, repeatedly, and safely moves the software from development infrastructure to production infrastructure.
+--> DevOps solves the drawbacks of both waterfall and agile models.
+--> It improves the collaboration and productivity by :
+automating infrastructure
+automating workflows
+continuously monitoring application performance
+
+==> DevOps -> Patric Debois with his team (2008-2009)
+
+Benefits of DevOps:
+
+1) High quality
+2) Faster updates
+3) Reliable
+4) Scalable and flexible
+5) Lesser defects
+6) Lower cost
+7) Shorten the software development process
+8) faster delivery and reduce time to recover
+
+DevOps has 200+ tools.
+
+1) Source Code Management Tools:
+--> Source code management tools are served to store the code with various versions
+--> Here we will get to know all the minor & major changes with date & time
+
+SCM Tools:
+GIT
+SVN
+GitLab
+BitBucket etc.,
+
+2) Build Tools: Build tools are used to build the code and it generates an executable file.
+Here we will get executable files in various formats like .Jar, .War, .Ear etc.,
+
+Build Tools:
+Maven
+ANT
+Gradle
+
+3) Application servers: All the executable files are deployed in application servers to access the application.
+--> Here all the code changes from SCM tools will keep continuously build using build tools and deploy the code to application servers so that
+we can access all the minor and major requirements.
+
+Tomcat
+Web Logic
+JBoss
+Web Sphere
+
+4) CI & CD: Here all the process is configured using ci & cd tools.
+--> Like we need configure SCM, build, and application servers.
+--> It is a automated process where we can pre-defined when to pull the code from SCM, and when to build using build tools, and where to deploy executable files.
+
+Jenkins (CI & CD)
+AWS codepipeline
+GitHub actions
+GitLab CI/CD
+
+5)Cloud computing: It is a internet based computing that provides shared computer process resources on rental basis.
+based on usage, we can enhance or reduce the capacity.
+AWS
+AZURE
+GCP
+
+
+========================
+
+AWS+DevOps
+
+OS - LINUX (RHEL), WINDOWS
+SCM - GIT, GITHUB
+BUILD - MVN
+CI CD - JENKINS
+CONFIGURATION MANAGEMENT - ANSIBLE
+CONTAINER - DOCKER
+CONTAINER ORCHESTRATION - KUBERNETES
+IAC - TERRAFORM
+APPLICATION SERVER - TOMCAT
+CLOUD - AWS
+CODE QUALITY - SONARQUBE
+ARTIFACTORY - NEXUS/JFROG
+SCRIPTING- PYTHON SCRIPTING, SHELL/BASH
+CONTINUOUS DELIVERY - Argo CD
+MONITORING - PROMETHEUS, GRAFANA, NAGIOS
