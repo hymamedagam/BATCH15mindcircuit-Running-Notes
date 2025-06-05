@@ -1,0 +1,78 @@
+# persistent volume manifest file
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+    name: ebs-static
+spec:
+    accessModes:
+        - ReadWriteOnce  #volume can be mounted as read-write by only one node at a time.one pod(or multiple pods) on the same node can access it read/write  
+    capacity:
+        storage: 20Gi
+    csi:
+        driver: ebs.csi.aws.com
+        fsType: ext4
+        volumeHandle: vol-09dc2fbfa66545b33 # newly created volume id
+
+
+# persistent volume claim manifest file
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: ebs-static
+spec:
+    storageClassName: ""
+    volumeName: ebs-static
+    accessModes:
+        - ReadWriteOnce
+    resources:
+        requests:
+            storage: 5Gi
+
+
+
+# pod with volume mount manifest file
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: ebs-static-pod
+    labels: 
+        purpose: ebs-static
+spec:
+    nodeSelector:
+        topology.kubernetes.io/zone: us-east-1c
+    containers:
+        - name: facebook
+          image: devopshubg333/batch15d:httpd_amazonlinx
+          volumeMounts:   
+              - name: ebs-static
+                mountPath: /var/www/html
+    volumes:
+        - name: ebs-static
+          persistentVolumeClaim:
+            claimName: ebs-static
+
+
+              
+
+
+# service manifest file to access pods
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: fb-srv
+spec:
+    type: LoadBalancer
+    selector:
+        purpose: ebs-static
+    ports:
+        - port: 80  # service port
+          targetPort: 80 # container port
+

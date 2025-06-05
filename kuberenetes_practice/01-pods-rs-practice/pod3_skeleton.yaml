@@ -1,0 +1,16 @@
+# kubectl run pod3 --image nginx --dry-run -o yaml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: pod3
+  name: pod3
+spec:
+  containers:
+  - image: nginx
+    name: pod3
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}

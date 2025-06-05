@@ -1,0 +1,11 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+    name: efs-dynamic
+provisioner: efs.csi.aws.com
+parameters:
+    provisioningMode: efs-ap
+    fileSystemId: fs-022b028cf12280b9a
+    directoryPerms: "700"
+    basePath: "/facebook"

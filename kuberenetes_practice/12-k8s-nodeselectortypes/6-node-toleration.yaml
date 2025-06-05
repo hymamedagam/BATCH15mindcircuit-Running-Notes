@@ -1,0 +1,27 @@
+---
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+    name: fbdeploy
+    labels:
+        app: facebook
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: facebook
+    template:
+        metadata:
+            name: fbpod
+            labels:
+                app: facebook
+        spec:
+            nodeName: ip-192-168-30-85.ec2.internal  #tainted node name
+            containers:
+                - name: fbcont1
+                  image: nginx
+            tolerations:
+                - key: "critical"
+                  operator: "Equal"
+                  value: "true"
+                  effect: "NoExecute"

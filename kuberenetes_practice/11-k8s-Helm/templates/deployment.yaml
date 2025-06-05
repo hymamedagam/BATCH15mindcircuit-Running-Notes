@@ -1,0 +1,24 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: fb-deploy
+    labels:
+        app: facebook
+        env: lab
+spec:
+    selector:
+        matchLabels:
+            app: facebook
+    replicas: {{ .Values.deployment.replicas }}
+    template:
+        metadata:
+            name: fb-pod
+            labels:
+                app: facebook
+        spec:
+            containers:
+                - name: fbcont1
+                  image: hymavathimedagam/docker1repo:{{ .Values.deployment.imageversion }}
+                  ports:
+                      - containerPort: 8080

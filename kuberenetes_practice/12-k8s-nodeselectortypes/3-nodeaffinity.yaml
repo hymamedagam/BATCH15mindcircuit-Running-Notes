@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: fb-deploy
+    labels:
+        app: facebook
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: facebook
+    template:
+        metadata:
+            name: fb-pod
+            labels:
+                app: facebook
+        spec:
+            affinity:
+                nodeAffinity:
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                      nodeSelectorTerms:
+                        - matchExpressions:
+                            - key: env
+                              operator: In 
+                              values:
+                                  - prod
+                                  - sbox
+                    preferredDuringSchedulingIgnoredDuringExecution:
+                        - weight: 100
+                          preference:
+                              matchExpressions:
+                                  - key: topology.kubernetes.io/zone
+                                    operator: In 
+                                    values:
+                                        - us-east-1b
+            containers:
+                - name: fbcont1
+                  image: nginx
+                                    
