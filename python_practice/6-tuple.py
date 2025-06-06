@@ -1,0 +1,11 @@
+my_tuple = (1,2,3,4,3,2,1,5)
+print(type(my_tuple))
+index_of_2 = my_tuple.index(2)
+print("index of 2: ", index_of_2)
+print("length of the tuple: ", len(my_tuple))
+print("Max element: ", max(my_tuple))
+print("Min element: ", min(my_tuple))
+print("Sum of elements: ", sum(my_tuple))
+count_of_3 = my_tuple.count(3)
+print("Count of 3 is: ", count_of_3)
+
