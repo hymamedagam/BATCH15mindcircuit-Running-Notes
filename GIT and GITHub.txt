@@ -1,0 +1,1006 @@
+2025-May-26(Git classes)
+====================
+
+
+Before VCS (Version Control System) like Git, developers used several manual techniques to track and manage changes
+in files. However, these methods had significant limitations.
+
+--> Developers manually created copies of files with different versions, often using filenames like
+project_v1.doc, project_v2.doc, final_project.doc, final_project_revised.doc
+
+1) No automatic versioning: Manual file copies led to confusion and redundancy.
+2) Difficult Collaboration: Multiple users editing the same file could cause conflicts and overwrites.
+3) Storage inefficiency: Keeping multiple copies of files consumed excessive disk space.
+4) No change history: No way to track who made changes, when or why
+5) Error-prone merging: Merging changes manually was slow and risky.
+6) No Rollback mechanism: If a mistake was made, recovering an old version was difficult.
+7) Lack of Security: Files could be accidentally deleted or modified without tracking
+8) No branching support: Experimenting with different versions required manual duplication.
+
+VCS:
+====
+It solved the problems of file tracking by introducing structured and automated version management.
+
+1) Automatic versioning: VCS tracks all changes automatically, eliminating the need for manual file copies.
+2) Efficient collaboration: Multiple users work on the same project without overwriting each other's changes.
+3) Storage optimization: Instead of duplicating entire files, VCS stores only changes, saving disk space.
+4) Change history: Every modification is recorded with details like author, timestamp, and commit message.
+5) Easy merging: Advanced algorithms help merge changes from multiple contributors without conflicts
+6)Rollback & Recovery: Developers can revert to previous versions if needed.
+7) Security & Access control: Permissions and authentication ensure controlled access to files
+8) Branching & Experimentation: Developers can create separate branches for new features, test them, and merge when ready.
+
+
+Types of VCS: 
+1)Centralized version control systems (CVCS)
+==> A single central server stores all versioned files.
+==> Developers pull and push changes to/from this central repository
+* Enterprise applications with strict access control is the use case.
+* Developers depend on central server, causing conflicts if multiple people edit the same file.
+eg: SVN --> Subversion
+    CVS --> Concurrent Version System
+    Perforce --> Helix Core
+
+Limitations:
+* Single point of failure leads to no access
+* Requires internet connection for most operations
+* Slow for large teams and projects.
+* If central server fails, data loss is possible.
+
+2) Distributed Version Control System (DVCS)
+==> Each developer has a complete copy of the repository, including history.
+==> Supports offline work and faster operations.
+
+Eg:
+Git (most popular, used in GitHub, GitLab, Bitbucket)
+Mercurial
+Bazaar
+
+Advantages over CVCS:
+* No central dependency
+* Faster and more efficient branching/merging.
+* Developers can work offline.
+
+
+Git:
+=======
+* It is an application/software.
+* It is a distributed version control system
+* Used to track changes in code or files in a project.
+* installed on local system.
+
+Git Hub:
+--------
+* It is a website
+* Cloud based
+* Store Git repositories online.
+* for project management and collaboration
+
+Git install:
+===========
+Go to browser or google, type "git download/git bash download"
+click "windows", install.
+
+In Linux
+==============
+yum install git -y
+
+GitHub account:
+=============
+Go to browser, type GitHub, click on first link, signup (for new account), enter email, set password, enter username, continue, solve puzzle, create account, enter code, (2-5) people, teacher, continue for free
+
+It opens a GitHub account.
+
+=======================
+Basic Linux commands used in Git:
+=======================
+pwd --> Prints current working directory
+cd --> change directory
+cd .. --> back to previous directory
+touch filename  --> creates a new file
+mkdir directoryname --> creates a new directory
+cat filename --> displays content in a file
+vi/vim editor/nano editor  --> text editors used in Linux
+history --> displays previously executed commands
+rm -rf <filename> --> deletes files/directories forcefully and recursively
+clear or ctrl+l --> to clear the space
+
+ls--> lists files/directories
+ls -la --> lists files including hidden files
+ls -lrth 
+ll
+============================
+Git concepts: Global Information Tracker
+*********************
+mkdir <directoryname>
+git init --> initialize an empty repository
+ll
+ls -la
+(default branch is master)
+
+Git configuration:(we need to configure to know who made changes and which commit made by whom while working on a project)
+1) System level 2) user level (global) 3) Repository level
+git config --system --list :(It automatically applies configurations to who all are accounts present in the system)
+
+2)User level: git config --global --list
+git config --global user.name "hyma"
+git config --global user.email "hyma@gmail.com"
+
+git config --list: it displays system and user level configurations in git.
+
+=====================
+
+Git Workflow/Stages:
+**********************
+1) Working directory
+2) staging area/index
+3) Local repository
+4) Remote repository
+-----------------------
+create a file
+touch f1
+git status (it will be under untracked state -> workspace/working directory)
+git add <filename> --> file moved to staging area and it is tracked
+git commit -m "commit message> <filename> --> file is committed to local repo
+git status : to check the status of files
+git log: to check the history of commits
+git show <commitid> --> detailed info about specific commit.
+git push: push changes in files from Local repository to cloud repository
+git clone: copy of a project/folder directly from cloud repo to working directory ( no need to use git init)
+
+
+you can do same for multiple files also.
+
+git add .
+git commit -m "commit message"
+(all files tracked and committed at once)
+
+**********************
+GitHub account:
+
+medagamreddy306@gmail.com
+h9y3m9a2
+username: hymamedagam
+
+created repository: hymadevopsrepo
+githubtoken: 
+
+***********************
+task-1: practice on local repo
+task-2: create own central repo and clone it to local repo and again push the code to central repo.
+task-3: clone devopstraininghub(b15 repo url) and perform below steps and push it to devopstraininghub repo
+git clone <url>
+cd <repo name>
+ll
+touch xyz
+git status
+git add .
+git status
+git commit -m "commit message"
+git status
+git log
+git push
+
+git pull -rebase: get file changes from remote repo to local repo
+git clone --> get changes in files from central(remote( repo to local repo)
+
+create a new repository in GitHub account dashboard.
+
+git clone <url>
+cd <repo name>
+ll
+touch filename
+ll
+git status
+git add .
+git status
+git commit -m "commit message" filename
+git status
+git log
+git push( it opens a pop at first time)
+
+we can push code from local repo to central repo in two ways.
+1) sign in with browser (username, password)
+2) Token (settings> developer options> personal access tokens> general (classic))
+
+========================================
+Branching:
+===============
+--> Independent line of development
+--> Developers creates branches to work on independent features for significant changes, releases etc., without effecting the main code.
+--> main branch contains the production deployable code.
+local repo
+===========
+git branch : check the status of branch/which branch it is
+git branch <branch name> : create a new branch
+git checkout <branch name> : switch between branches
+git checkout -b <branch name>: create and switch to a new branch
+git checkout main/master
+git merge <branch name>
+
+git branch -d <branch name>: deletes the branch after merging with the main branch
+git branch -D <branch name>: deletes the branch without merging with the main branch
+
+default branch master
+
+central repo:
+=============
+default branch main
+
+git clone <url>
+ll
+cd <repo name>
+git branch
+
+git branch <branchname>
+git branch
+git checkout <branch name>
+create files(git add <filename>, git commit)
+ll
+
+don't merge branches with main branch --> as main branch contains ongoing production code
+==> push branch to central repo : git push <GitHub url> <branch name>
+
+
+origin -> reference to our repo url
+
+git push origin <branch name>
+
+Task 4: our branches needs to be displayed in Madhu sir's central repo.
+task 5: push folders to Madhu sir's central repo
+
+mkdir dir1
+cd dir1
+touch hyma1 hyma2
+git status
+git add .
+git commit -m "mssg"
+git status
+git push
+
+git push --> push committed files to main branch in remote repo
+git push origin --> pushes branches to remote repo
+task: practice branching on locally (git init)
+task: clone, create branch, push (centrally clone)
+
+central repo: delete branch in central repo 
+git push origin -d <branch name>
+
+Note: we only push code after cloning repo to local repo.
+
+git clone <url>
+git push
+
+jun2-2025
+====================================
+touch <filename> --> creates an empty file
+vi/vim <filename> -> creates a file and we can modify/edit/place some content in the file.
+
+Edit files in Linux:
+----------------------
+LINUX FILE EDITOR: Vi/Vim editor / nano editor
+
+vim <filename>
+--
+--
+--
+--
+esc--i (Insert)
+(add data)
+esc:wq  (save and quit)
+esc:w (save)
+esc:q (quit)
+esc:q! (forcefully close without save the data)
+
+if you want to delete data in vim editor use backspace
+
+What if two branches are parallelly moving:
+--------------------------------------------
+--> After commit only we can see branch.
+--> when we are merging one branch with another branch, a new merge commit id is created.
+
+=> git cherry-pick <commit_id>: merge specific commit from one branch with another branch.
+
+Git merge conflicts:
+=================
+--> If two branches contain same filename(different code), it will not be able to merge.
+
+-->If two branches contain same filename(same code), it will be able to merge.
+
+--> merge conflict occurs, when two developers working on the same file but content is different
+
+Note: We will engage developers to confirm on which code is considered, or suggest on changes in files and resolve conflicts manually.
+
+Jun-3-2025:
+========
+git branch:
+Lists local branches in your repository.
+
+git branch -r:
+Lists remote branches (i.e., branches on remotes like origin).
+
+git branch -a:
+lists both local and remote branches.
+
+git checkout <branch_name> -- --> if the file and branch contains same name it throws an error to which one git checkout(file or branch).
+so use --
+
+git cherry-pick <commit_id> --> apply specific commit from another branch onto your current branch.
+
+Note: Like git merge in local repository, we use pull request in central repository(GitHub).
+(reviewers can be our repo contributors, and we can assign it ourselves)
+
+June-4:
+==========
+
+Git fork: copy remote repo into my github account.(open source projects)
+
+Filtering:
+------------
+git log 
+git log --oneline
+git log -n : eg--> git log -3 --> i will get last 3 commits
+git log --oneline -n
+
+git log --author hyma --> I will get commits committed by the author hyma
+git log --since '06-03-2025' --> i will get commits from June 3rd. Date must be in the format " MM-DD-YYYY"
+git log --since '06-03-2025' -3 --> i will get last 3 commits from June 3rd.
+git log -3 --author fbappuser
+
+
+Jun-5
+=========
+git config --global user.name <name>
+git config --global user.email <email>
+
+git config --list
+
+Custom configurations
+========================
+I want to use short cuts or alternatives for 
+
+git status, git log, git log --one line etc.,
+
+use --> alias (alias means 'instead of that') --> alias used for create shortcuts
+
+git config --global alias.s "status"
+git config --global alias.l "log"
+git config --global alias.lo "log --oneline"
+
+git config --list
+
+so we can use --> git s, git l, git lo instead of using git status, git log, git log --oneline
+
+unset alias
+============
+git config --global --unset alias.s
+git config --global --unset alias.l
+git config --global --unset alias.lo
+
+
+amend command: Modify the last or latest commit/fix commit messages or add newly created files into the latest commit.
+===============
+for example, i created two files:
+touch jenkins1 jenkins2
+git add . && git commit -m "Jenkins commit"
+git status
+git log
+
+1) here i want to modify the commit message, use --amend command
+git commit --amend -m "Jenkins files commit"
+
+git log
+(above commit message will be modified)
+
+2) create another file: touch jenkins3
+git add . && git commit -m "jenkins3 commit --> if we give this it will create a separate commitid
+
+git add . && git commit --amend -m "Jenkins files commit" --> it adds jenkins3 file in the above commit
+git add . && git commit --amend -m "Jenkins files commit" -m "jenkins3 file commit" --> it adds jenkins3 file in the above commit and we can add multiple commit messages also.
+
+
+-am command: quickly commits modified files, not suitable for new files.
+==========
+git commit -am "message"
+This combines two flags:
+
+-a: Stage all tracked (modified) files.
+
+-m: Provide a commit message.
+
+Note: In git, if we create a new file, it must follow git lifecycle
+(git add <fname>, git commit -m "commit message")
+
+use case: If we want to move file from working directory to local repo (commit), it is suitable for modified files only)
+
+eg: vim jenkins1
+   (add some code)
+ cat jenkins1
+git status
+git commit -am "jenkins1 modified"
+
+
+git revert: Undo(cancel changes in) a commit by creating a new commit that reverses its changes.
+==========
+
+git revert <commit_id>
+
+eg: vim jenkins1
+  (add some code)
+vim jenkins2
+(add some code)
+git add . && git commit -m "commit message"
+(a new commit id is created)
+
+if you don't want this commit as you find some bugs, you can revert to previous commit.
+git revert < use the commit id which you don't want>
+( a new commit id created for this revert changes)
+
+if you want to revert again(which we deleted in previous commit), use new commit id
+git revert < new commit id> --> it reverts changes
+
+
+git reset: undo commits or unstage files by moving the HEAD pointer.
+=========
+git reset HEAD <filename> : staging area to workspace
+git reset --soft <commit_id> (n-1) --> Local Repository to staging area
+git reset --mixed <commit_id> (n-1) --> Local Repository to workspace
+
+Note: n-1 means not the latest commit, previous commit to latest commit.
+
+
+git tag: Mark specific points in history (like releases). Tags are used to label commits, often for releases or versions.
+=========
+git tag: lists tags
+git tag <tag_name> : creates a tag
+git checkout <tag_name>: switches to tag
+git tag -d <tag_name>: deletes a tag
+git push origin <tag_name>: pushes tag to remote repo
+git push origin -d <tag_name>: deletes a tag in remote repo
+
+git tag <tag_name> <commit_id> : create tag for particular commit.
+
+
+Jun-6-2025
+===========
+🔄 git merge
+
+Combines changes from one branch into another by creating a new merge commit.
+Preserves the original branch history (non-linear).
+
+Use case:
+Best for team collaboration to preserve full history and context.
+Used when merging a feature branch into main or develop.
+
+git checkout main
+git merge feature-branch
+
+🔁 git rebase
+
+Moves or "replays" your commits on top of another branch, creating a linear history.
+Rewrites commit history.
+
+Use case:
+Best for cleaning up local commit history before sharing.
+Used to update a feature branch with latest main without merge commits.
+
+git checkout feature-branch
+git rebase main
+
+Summary:
+Feature		git merge				git rebase
+History		Preserves branch history		Rewrites history to be linear
+Commit style	Creates a merge commit			No merge commit
+Use for		Collaborative merging			Clean local history, avoid clutter
+Safety		Safe for shared branches		Use carefully with public branches
+
+git pull: git fetch + git merge origin
+Merges remote changes into your current branch with a merge commit (if needed).
+Fetching and merging remote changes into your current branch in one step.
+
+git pull --rebase
+Reapplies your local commits on top of the updated remote branch (linear history).
+
+git fetch
+Downloading the latest changes from the remote without merging them into your current branch.
+
+git stash
+The git stash command is used to temporarily save (or "stash") your uncommitted changes so you can work on something else without losing them.
+git stash            # Stashes all changes (tracked files)
+git stash -u         # Stashes changes including untracked files
+git stash pop        # Applies and removes the most recent stash
+git stash apply      # Applies the stash, but keeps it in the stash list
+git stash list       # Shows all stashed entries
+
+git stash list
+git stash save "label"
+
+git stash show stash@{x}
+
+POP, APPLY, DROP
+-----------------
+POP - cut
+----
+git stash pop
+
+APPLY  - copy
+------
+git stash apply
+
+DROP  - delete
+-----
+git stash drop
+
+
+
+
+Imp points
+===============
+Note: warning: in the working copy of 'abc', LF will be replaced by CRLF the next time Git touches it
+Yes, this warning (not an error) is indeed caused by differences in operating systems, specifically how they handle line endings:
+🔁 Line Endings by OS:
+Operating System	Line Ending Used
+Linux/macOS	LF (\n)
+Windows	CRLF (\r\n)
+===============
+
+Why .git Is Crucial
+
+git init: initializes an empty git repository (creates a .git/ folder --> which hold entire git project)
+
+Without .git, your folder is just a regular directory — no version history, no commits, no branches.
+
+It holds your entire project history, so you can:
+
+Track changes
+
+Revert to earlier versions
+
+Merge code
+
+Collaborate with others
+
+If you delete .git/, you lose all version history and Git functionality.
+
+======================
+
+🔄 Visual Summary:
+
+[Working Directory] --git add--> [Staging Area (Index)] --git commit--> [Local Repository]
+
+ 1. Working Directory
+Also called the Working Tree.
+
+✅ What It Is:
+The actual files and folders you see and edit in your project folder.
+
+🧠 Purpose:
+This is where you make changes: edit files, create new ones, delete others.
+
+These changes are not tracked by Git until you stage them.
+
+💡 Example:
+You open main.py, change some code — that's a change in the working directory.
+
+📌 2. Staging Area (also called the Index)
+✅ What It Is:
+A preview area where you tell Git, “I want to include these changes in the next commit.”
+
+🧠 Purpose:
+You use git add <file> to move changes from the working directory to the staging area.
+
+Lets you control exactly what gets committed, even if other files have also changed.
+
+💡 Example:
+bash
+
+git add main.py
+Now main.py is staged — it's ready to be committed.
+
+📌 3. Local Repository
+Also called the Git Directory — stored inside .git/.
+
+✅ What It Is:
+The history of all commits and snapshots of your project.
+
+🧠 Purpose:
+When you run git commit, changes from the staging area go into the local repository.
+
+This is where all your branches, tags, and commit history live.
+
+You can work with it entirely offline.
+
+💡 Example:
+bash
+
+git commit -m "Fix bug in main.py"
+The staged change is saved permanently in your local repo.
+
+
+🎯 Summary of Use:
+Area			Contains			Key Command	Purpose
+Working Directory	Modified files			edit files	Where you write code or change files
+Staging Area		Selected changes		git add		Prepares changes for commit
+Local Repository	Commit history & versions	git commit	Stores full project history
+
+===================================
+🔹 git add
+Purpose:
+Stages changes (adds files or updates) to the staging area.
+
+Usage:
+
+git add <file>    # Add one file
+git add .         # Add all changes in the current directory
+Think of it as:
+📦 "I want this change to be part of my next commit."
+
+🔹 git commit
+Purpose:
+Saves staged changes to the local repository as a snapshot.
+
+Usage:
+
+git commit -m "Your message"
+Think of it as:
+📝 "Take a snapshot of what’s staged."
+
+🔹 git status
+Purpose:
+Shows the state of the working directory and staging area.
+
+Usage:
+
+git status
+Think of it as:
+🔍 "What’s changed? What’s staged? What’s not?"
+
+🔹 git log
+Purpose:
+Displays the commit history.
+
+Usage:
+
+git log           # Detailed view
+git log --oneline # Compact view
+Think of it as:
+📚 "Show me the history of changes."
+
+🔹 git show
+Purpose:
+Shows the details of a specific commit (diff + metadata).
+
+Usage:
+git show          # Shows the latest commit
+git show <commit-hash>
+Think of it as:
+🔍 "Give me the full details of this commit."
+
+🔹 git clone
+Purpose:
+Creates a local copy of a remote repository.
+
+Usage:
+git clone <repo-url>
+Think of it as:
+📥 "Download this project with its full history."
+
+🔹 git fork (Note: Not a Git command)
+Purpose:
+Not a direct Git command—it's a feature provided by platforms like GitHub, GitLab, etc.
+
+Usage:
+Click the "Fork" button on the remote repo page.
+
+Think of it as:
+🍴 "Create my own copy of someone else's repo under my GitHub account."
+
+🔹 git cherry-pick
+Purpose:
+Apply a specific commit from another branch onto your current branch.
+
+Usage:
+
+git cherry-pick <commit-hash>
+Think of it as:
+🎯 "Take that one commit and apply it here."
+
+🔹 git pull --rebase
+Purpose:
+Fetch and reapply your local commits on top of the remote branch — makes history cleaner than a merge.
+
+Usage:
+git pull --rebase
+Think of it as:
+🔄 "Update my branch, but replay my commits as if they happened after the latest remote ones."
+
+Quick Comparison:
+Command			Purpose							Think of it as
+git fork		Make a remote copy of a repo (via GitHub)	🍴 Copy this project to my account
+git cherry-pick		Apply a specific commit from elsewhere		🎯 Pick that one commit to reuse here
+git pull --rebase	Update with remote changes cleanly		🔄 Reapply my work on top of latest code
+
+🔹 git push
+Purpose:
+Uploads your local commits to a remote repository (e.g., GitHub, GitLab).
+
+Usage:
+git push            # Push current branch to its remote
+git push origin main  # Push 'main' branch to 'origin' remote
+Think of it as:
+🚀 "Send my local commits to the remote repo."
+
+git branch:
+Lists local branches in your repository.
+
+git branch -r:
+Lists remote branches (i.e., branches on remotes like origin).
+
+git branch -a:
+lists both local and remote branches.
+
+git checkout <branch_name> -- --> if the file and branch contains same name it throws an error to which one git checkout(file or branch).
+so use --
+
+git commit --amend
+Use: Modify the last commit.
+
+Example: Fix a commit message or add forgotten files.
+
+Command:
+git commit --amend
+
+git alias
+Use: Create shortcuts for Git commands.
+
+Example: Make git co run git checkout.
+
+Command:
+git config --global alias.co checkout
+
+==================
+-am used in: -am used for modified files only, not suitable for new files.
+
+git commit -am "message"
+This combines two flags:
+
+-a: Stage all tracked (modified) files.
+
+-m: Provide a commit message.
+
+In short:
+Use: Quickly commit all modified tracked files with a message.
+
+Example:
+
+git commit -am "Update config files"
+⚠️ Note: It doesn’t stage new (untracked) files — you still need git add for those.
+
+
+git revert: cancel changes from previous one.
+Use: Undo a commit by creating a new commit that reverses its changes.
+
+git revert <commit_id>
+
+git reset
+=============
+Use: Undo commits or unstage files by moving the HEAD pointer.
+
+Types:
+
+1. --soft
+Use: Undo commit(s), keep changes staged.
+
+Command:
+
+git reset --soft <commit>
+2. --mixed (default)
+Use: Undo commit(s), unstage changes, but keep them in working directory.
+
+Command:
+
+git reset --mixed <commit>
+3. --hard
+Use: Undo commit(s) and delete changes from working directory.
+
+⚠️ Dangerous: Cannot be undone easily.
+
+Command:
+
+git reset --hard <commit>
+In short:
+soft = keep staged
+
+mixed = keep changes, unstaged
+
+hard = delete everything after reset point
+
+git tag: Mark specific points in history (like releases).
+-----------------------
+git clean: removes untracked files or directories from your working directory.
+Note: This command permanently deletes files- they are not recoverable by Git.
+--> git clean helps you remove unnecessary, untracked files and keep your working directory clean and tidy.
+
+git clean -f : Force delete untracked files.
+git clean -fd : Delete untracked files and directories.
+git clean -n : Dry run -shows what will be deleted (safe to check first)
+git clean -fx : Delete untracked files including ignored files (.gitignore)
+git clean -fdx: Delete everything untracked, including ignored files & dirs.
+---------------------
+.gitignore: .gitignore is a special file in a Git project where you specify which files and folders Git should ignore(i.e., not track or commit).
+.gitignore only applies to untracked files.
+
+usage:
+1) create a .gitignore file: touch .gitignore
+2) open it and add files/folders to ignore: vi .gitignore
+# ignore all .log files
+*.log
+# Ignore all files in temp folder
+temp/
+
+3) check what files are ignored:
+git status
+4) save the file and commit
+
+stop tracking a file already committed: git rm --cached filename
+
+It ignore unwanted files like:
+Temporary files
+Log files
+Build files
+Personal settings
+These files are usually not needed in Git repository
+--------------
+git diff: Show the differences between various states of your files and commits in a Git repository.
+--> mainly used to track and review changes during development.
+
+working directory and staging area
+staging area and last commit
+two commits, branches, or files
+
+git diff --> shows changes not staged (working directory vs. index)
+git diff --staged or --cached --> Shows staged changes (index vs.last commit)
+git diff HEAD --> shows all changes (working directory & staging vs. last commit)
+git diff <file> --> Shows changes in a specific file
+git diff <commit1> <commit2> --> Shows differences between two commits
+git diff <branch1> <branch2> --> Shows differences between two branches
+-----------------
+git bisect: git bisect is used to find the commit that introduced a bug by using binary search.
+--> It helps you quickly find which commit caused a problem(like a bug or error), by automatically checking half the commits at each step.
+
+good commit: a commit where everything was working fine. No bugs or errors in your code at that point
+bad commit: A commit where the bug or issue is present. Something is broken or not working as expected.
+
+git bisect good <commit> : tell git the last good commit
+git bisect bad: tell git the bad commit
+
+-----------------------
+merge conflicts:
+
+A Git merge conflict happens when git can't automatically merge changes between two branches because of the same part of a 
+file was changed in both.
+
+why do merge conflicts occur?
+
+1) same file, same line is edited in both branches
+2) a file id deleted in one branch but modified in another
+3) a file is renamed in one branch but changed in another.
+
+How to resolve conflicts:
+
+1) manually edit the file and choose the correct code, mark the conflict as resolved.
+
+Tips to avoid conflicts:
+
+1) pull latest code regularly
+git pull origin main
+
+2) communicate with teammates about shared files
+3) make a small, frequent commits
+
+----------------------
+Git lifecycle: Shows how a file moves through different stages in a Git project from
+when you start editing it to when it becomes part of your project history(commit).
+Main stages of Git Life cycle:
+working directory : Where you modify files
+staging area: Temporary area where you prepare files for commit
+Local repository: Where committed changes are stored locally
+Remote Repository: central server(like GitHub) where code is pushed.
+-----------------------
+Branching strategy: It is a workflow or plan that defines how branches are created, named, merged,
+and deleted in a Git repository. It helps teams manage code changes, collaboration, and releases in a structured way.
+
+purpose of branching strategy:
+
+1) avoid code conflicts
+2) organize features, fixes, and releases
+3) Enable parallel development
+4) make collaboration easier
+
+common branching strategies:
+1) main/master only strategy
+All commits got to main branch
+
+2) Feature branching:
+Create a new branch for every feature branch. merge back into main after completion.
+
+3)Git Flow:
+A full-featured strategy with multiple long-living branches
+--> best for large teams or long-term projects
+
+4) GitHub Flow:
+Lightweight and modern strategy for CI/CD workflows
+1) create a branch from main
+2) push changes and open a PR
+3) review and test
+4) merge back into main
+
+--> best for fast deployments and web apps
+
+5) Trunk-based development:
+
+All developers commit frequently to a single shared branch like main.
+--> fast, encourages continuous integration
+-------------------
+
+is Git better than SVN: We can't say which is better. it's up to you.
+Git allows every developer to have a complete copy of the repository, whereas SVN relies on centralized model.
+
+git clone: creates a copy of remote repository on your local machine.
+
+git push: for uploading content(transfers committed changes) to a remote repository from a local repository.
+
+git repository: stores project's files and revision history.
+
+what is commit in git?
+--> A commit represents a snapshot of the changes  made to files in a repository at a specific point in time.
+
+✅ In Simple Words:
+A commit =
+📸 A saved version of your project
+📝 With a message describing what changed
+🆔 Identified by a unique ID (hash)
+
+Limitations of Git:
+⚠️ Hard to Learn: Git has a steep learning curve, especially for beginners.
+
+📦 Bad with Large Files: Not good at handling big files like videos or datasets. (use git LFS(Large File Storage)
+
+🐌 Slow with Big Projects: Very large repositories can slow down performance.
+
+🔄 Dangerous Commands: Commands like reset or rebase can break history if used carelessly.
+
+🧩 Complex Submodules: Using one repo inside another (submodules) is confusing and error-prone.
+
+
+remote repository: Any Git repository hosted on a server (like GitHub, GitLab, Bitbucket)
+origin: Shortcut name for the remote repo. origin is the default name for the remote repository you cloned from.
+your remote repository (usually your fork or the repo you cloned from)
+upstream = the original remote repository from which you forked(another ones remote repo)
+
+git log : shows the commit history of your Git repository
+
+git reflog: 
+shows a log of all the recent changes to the HEAD (and other refs) in your local repository.
+It records every move your HEAD pointer makes, such as commits, resets, checkouts, rebases, etc.
+
+To recover lost commits after a reset or rebase
+
+To see recent movements of your HEAD and branches
+To undo mistakes by checking out or resetting to a previous state
+
+git log shows the commit history of the current branch, while git reflog records all movements of HEAD and refs, 
+including commits not in the visible history.
+
+
+
+
+
+
+
+
+
+
+
+
+
