@@ -1,7 +1,6 @@
 2025-May-26(Git classes)
 ====================
 
-
 Before VCS (Version Control System) like Git, developers used several manual techniques to track and manage changes
 in files. However, these methods had significant limitations.
 
@@ -61,6 +60,9 @@ Advantages over CVCS:
 * Faster and more efficient branching/merging.
 * Developers can work offline.
 
+Repository: Repository is a storage space where all project files and their version history is stored and managed
+1) Local repo: on your own machine
+2) Remote Repo: On host server(GitHub, GitLab, Bit Bucket)
 
 Git:
 =======
@@ -949,8 +951,6 @@ Git allows every developer to have a complete copy of the repository, whereas SV
 git clone: creates a copy of remote repository on your local machine.
 
 git push: for uploading content(transfers committed changes) to a remote repository from a local repository.
-
-git repository: stores project's files and revision history.
 
 what is commit in git?
 --> A commit represents a snapshot of the changes  made to files in a repository at a specific point in time.
