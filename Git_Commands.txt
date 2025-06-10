@@ -138,6 +138,13 @@ Automatically run tests when code changes.
 Deploy apps when code is pushed.
 Set up CI/CD (Continuous Integration / Deployment).
 
+-----------------
+How to create a bare repository:
+ --> git init --bare my-repo.git
+1) Does not have a working directory
+That means you can't edit files or run git add, git commit, etc., directly in i
+2) ✅ Is used mainly for collaboration or as a central/shared remote
+For example: a Git server repository others push to and pull from.
 
 
 
