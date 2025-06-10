@@ -921,7 +921,7 @@ purpose of branching strategy:
 
 common branching strategies:
 1) main/master only strategy
-All commits got to main branch
+All commits go to main branch
 
 2) Feature branching:
 Create a new branch for every feature branch. merge back into main after completion.
@@ -992,12 +992,48 @@ To undo mistakes by checking out or resetting to a previous state
 git log shows the commit history of the current branch, while git reflog records all movements of HEAD and refs, 
 including commits not in the visible history.
 
+------------------------
+git branching strategies: These are workflows that help teams organize code, manage versioning, and collaborate efficiently.
+Three common strategies are:
+1) Trunk-based development(single main branch): This strategy focuses on frequent integration and testing on the main branch.
+It simplifies CI/CD and rapid delivery
 
+2) GitHub flow(feature branches with pull requests): This strategy uses short-lived feature branches, pull requests for 
+code review, and merging directly into the main branch when a feature is complete.
+It promotes collaboration and code review.
 
+3) Git Flow ( Structured approach with multiple branches): This strategy uses multiple long-lived branches (main, develop, feature,
+release, and hotfix) to manage releases and hotfixes in a structured way.
+It is well-suited for larger teams or projects with complex release processes.
 
+--------------------------
+what is detached HEAD state in git?
+--> In Git, a detached HEAD state occurs when your current working directory's HEAD pointer is not associated with a branch,
+but instead points directly to a specific commit. This means, you are not currently on any branch, but are instead working on a specific commit in the repo's history.
 
+--> you are not currently attached to any branch, and as a result, your HEAD is detached.
+To keep the changes made while in the detached HEAD state, use these steps:
+1) create a new branch 2) commit the changes 3) Merge the changes.
 
+How to enter detached HEAD state:
+git checkout <commit_id>
+and also
+git checkout <tag>
 
+Why use detached HEAD state: Reviewing past commits without affecting your active branches.
+
+---------------------------
+How do you squash commits?
+--> Git squash is a way to combine multiple commits into one single commit.
+It helps cleanup your commit history before merging code - especially useful
+during code reviews.
+
+Decide how many commits to squash
+git rebase -i HEAD~3 --> If you want to squash the last 3 commits
+---------------------
+
+origin: you cloned and your fork
+upstream: you forked a repo from open source.
 
 
 
