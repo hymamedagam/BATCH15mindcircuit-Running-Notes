@@ -219,7 +219,7 @@ git checkout <branch name> or git switch <branch name>: switch between branches
 git checkout -b <branch name> or git switch -c <branch name>: create and switch to a new branch
 git checkout main/master
 git merge <branch name>
-
+rename a branch: git branch -m old new
 git branch -d <branch name>: deletes the branch after merging with the main branch
 git branch -D <branch name>: deletes the branch without merging with the main branch
 
