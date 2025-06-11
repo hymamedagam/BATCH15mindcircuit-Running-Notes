@@ -1034,26 +1034,28 @@ git rebase -i HEAD~3 --> If you want to squash the last 3 commits
 
 origin: you cloned and your fork
 upstream: you forked a repo from open source.
+-----------------------
+git restore: Undo changes in your working directory (and optionally from the staging area).
 
-git restore: undo changes in working directory or staging area
-
-git restore <filename> : undo changes in a file
+git restore <filename> : undo changes in a file or Discard local changes in working directory
 git restore --staged <filename> : unstages a file
 git restore meaning: (Bringing the file back to its previous state)
 ----------------------
-git rm: is a Git command used to remove files from your working directory and from Git's tracking.
-Stages the removal so the file will be deleted in the next commit
+git rm: Delete a file from your working directory and stage that deletion for commit.
 
-Remove a file completely (from both disk and Git):
-git rm filename.txt
-→ Deletes the file and marks it for deletion in the next commit.
-
-Just stop tracking a file (but keep it on disk):
-git rm --cached filename.txt
-→ Git will stop tracking the file, but the file stays on your system.
+git rm file.txt           # Deletes file.txt and stages the deletion
+git rm --cached file.txt  # Only untracks the file (keeps it on disk, removes from Git)
 
 what does the command git commit --amend do?
 commits the current staged changes and modifies the previous commit (If you have changes staged:)
 changes the commit message of the last commit without modifying the content (If you have no changes staged:)
 
+Note: git checkout -- file.txt
+This is the same as:
+git restore file.txt
 
+This command is older and now replaced by git restore.
+--------------------------
+Use git status to see the state of your files (modified, staged, etc.).
+Use git restore for undoing changes.
+Use git rm when you intentionally want to delete and commit the removal.
