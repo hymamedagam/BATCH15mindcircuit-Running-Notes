@@ -215,8 +215,8 @@ local repo
 ===========
 git branch : check the status of branch/which branch it is
 git branch <branch name> : create a new branch
-git checkout <branch name> : switch between branches
-git checkout -b <branch name>: create and switch to a new branch
+git checkout <branch name> or git switch <branch name>: switch between branches
+git checkout -b <branch name> or git switch -c <branch name>: create and switch to a new branch
 git checkout main/master
 git merge <branch name>
 
