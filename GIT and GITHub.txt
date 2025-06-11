@@ -1052,6 +1052,8 @@ Just stop tracking a file (but keep it on disk):
 git rm --cached filename.txt
 → Git will stop tracking the file, but the file stays on your system.
 
-
+what does the command git commit --amend do?
+commits the current staged changes and modifies the previous commit (If you have changes staged:)
+changes the commit message of the last commit without modifying the content (If you have no changes staged:)
 
 
