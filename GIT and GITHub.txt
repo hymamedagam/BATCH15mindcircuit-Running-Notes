@@ -1035,7 +1035,22 @@ git rebase -i HEAD~3 --> If you want to squash the last 3 commits
 origin: you cloned and your fork
 upstream: you forked a repo from open source.
 
+git restore: undo changes in working directory or staging area
 
+git restore <filename> : undo changes in a file
+git restore --staged <filename> : unstages a file
+git restore meaning: (Bringing the file back to its previous state)
+----------------------
+git rm: is a Git command used to remove files from your working directory and from Git's tracking.
+Stages the removal so the file will be deleted in the next commit
+
+Remove a file completely (from both disk and Git):
+git rm filename.txt
+→ Deletes the file and marks it for deletion in the next commit.
+
+Just stop tracking a file (but keep it on disk):
+git rm --cached filename.txt
+→ Git will stop tracking the file, but the file stays on your system.
 
 
 
