@@ -146,10 +146,19 @@ That means you can't edit files or run git add, git commit, etc., directly in i
 2) ✅ Is used mainly for collaboration or as a central/shared remote
 For example: a Git server repository others push to and pull from.
 
+Git branching strategy:
+"We used the Git Flow branching strategy in our project.
+It includes branches like:
+main (for production-ready code),
+develop (for the latest development work),
+and feature, bugfix, release, and hotfix branches as needed.
+This helped us organize our work, manage releases, and fix issues without affecting the main codebase."
 
 
+🧾 Who Introduced Git and When?
+Git was created by Linus Torvalds, the same person who created Linux.
 
-
+It was introduced in the year 2005.
 
 
 
